@@ -1,12 +1,13 @@
 
 import React, { useState } from 'react';
-import { RoadmapItem, Product, Milestone, Priority } from '../types';
+import { RoadmapItem, Product, Milestone, Priority, Vertical } from '../types';
 import { Star, Edit3, ChevronDown, ChevronUp, CheckCircle2, Timer, Plus } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
 
 interface PortfolioViewProps {
   items: RoadmapItem[];
   products: Product[];
+  verticals: Vertical[];
   milestones: Milestone[];
   onEditItem: (item: RoadmapItem) => void;
   onEditProduct: (product: Product) => void;
@@ -16,7 +17,7 @@ interface PortfolioViewProps {
 }
 
 const PortfolioView: React.FC<PortfolioViewProps> = ({
-  items, products, milestones, onEditItem, onEditProduct, onEditMilestone, onAddMilestone, onMoveItem
+  items, products, verticals, milestones, onEditItem, onEditProduct, onEditMilestone, onAddMilestone, onMoveItem
 }) => {
   const { t, language } = useTranslation();
   const [draggedItemId, setDraggedItemId] = useState<string | null>(null);
@@ -55,61 +56,70 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({
       {/* Grid de Conteúdo */}
       <div className="flex-1 overflow-auto custom-scrollbar bg-slate-50/20">
         <div className="min-w-[1200px]">
-          {products.length === 0 ? (
+          {verticals.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-40">
-              <div className="p-8 rounded-3xl bg-white border border-dashed border-slate-200 text-slate-300 mb-6 group hover:border-indigo-300 transition-colors">
-                <Star className="h-12 w-12 group-hover:scale-110 group-hover:text-indigo-400 transition-all duration-500" />
-              </div>
-              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">{t('noProducts') || 'Nenhum Produto Cadastrado'}</p>
-              <button
-                onClick={() => onEditProduct({ id: Math.random().toString(36).substring(2, 9), name: '', description: '', color: 'bg-indigo-500', createdAt: Date.now() })}
-                className="flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white rounded-[1.5rem] font-bold shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95"
-              >
-                <Plus className="h-5 w-5" />
-                {t('newProduct')}
-              </button>
+              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{t('noVerticals') || 'Nenhuma Família Cadastrada'}</p>
             </div>
           ) : (
-            products.map(product => (
-              <div key={product.id} className="flex border-b border-slate-100 group/row bg-white transition-colors hover:bg-slate-50/30">
-                <div className="w-64 flex-shrink-0 p-8 border-r border-slate-200/60 sticky left-0 z-30 bg-white group-hover/row:bg-slate-50/50 transition-all">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className={`h-9 w-9 ${product.color} rounded-2xl shadow-sm flex items-center justify-center text-white cursor-pointer group/icon hover:scale-105 transition-transform`} onClick={() => onEditProduct(product)}>
-                      <Edit3 className="h-4 w-4 opacity-0 group-hover/row:opacity-100 transition-opacity" />
+            verticals.map(family => {
+              const familyProducts = products.filter(p => p.familyId === family.id);
+              if (familyProducts.length === 0) return null;
+
+              return (
+                <div key={family.id} className="border-b-4 border-slate-200/40">
+                  {/* Family Header Row */}
+                  <div className="flex bg-slate-50/80 border-b border-slate-200/60 sticky left-0 z-20">
+                    <div className="w-64 flex-shrink-0 p-4 pl-8 border-r border-slate-200/60 flex items-center gap-3">
+                      <div className={`h-3 w-3 ${family.color} rounded-full`}></div>
+                      <span className="text-[11px] font-black text-slate-600 uppercase tracking-[0.2em]">{family.name}</span>
                     </div>
-                    <h3 className="font-display font-bold text-slate-900 leading-tight text-base tracking-tight">{product.name}</h3>
-                  </div>
-                  <p className="text-[11px] text-slate-500 font-medium leading-relaxed line-clamp-2">{product.description}</p>
-                </div>
-
-                <div className="flex-1 relative min-h-[180px]">
-                  <div className="absolute inset-0 grid grid-cols-12 pointer-events-none opacity-50">
-                    {MONTHS.map((_, i) => (
-                      <div key={i} className="border-r border-slate-100 last:border-r-0" />
-                    ))}
+                    <div className="flex-1 bg-white/30"></div>
                   </div>
 
-                  <div className="relative p-8 grid grid-cols-12 gap-y-6 auto-rows-min">
-                    {items
-                      .filter(item => item.productId === product.id)
-                      .map(item => {
-                        const span = Math.min(item.spanMonths || 1, 12 - item.startMonth);
-                        return (
-                          <div
-                            key={item.id}
-                            style={{ gridColumn: `${item.startMonth + 1} / span ${span}` }}
-                            className="transition-all z-10"
-                            draggable
-                            onDragStart={() => setDraggedItemId(item.id)}
-                          >
-                            <CleanItemCard item={item} milestones={milestones} onEdit={() => onEditItem(item)} />
+                  {/* Sub-products Rows */}
+                  {familyProducts.map(product => (
+                    <div key={product.id} className="flex border-b border-slate-100 group/row bg-white transition-colors hover:bg-slate-50/30">
+                      <div className="w-64 flex-shrink-0 p-8 border-r border-slate-200/60 sticky left-0 z-30 bg-white group-hover/row:bg-slate-50/50 transition-all">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className={`h-9 w-9 ${product.color} rounded-2xl shadow-sm flex items-center justify-center text-white cursor-pointer group/icon hover:scale-105 transition-transform`} onClick={() => onEditProduct(product)}>
+                            <Edit3 className="h-4 w-4 opacity-0 group-hover/row:opacity-100 transition-opacity" />
                           </div>
-                        );
-                      })}
-                  </div>
+                          <h3 className="font-display font-bold text-slate-900 leading-tight text-base tracking-tight">{product.name}</h3>
+                        </div>
+                        <p className="text-[11px] text-slate-500 font-medium leading-relaxed line-clamp-2">{product.description}</p>
+                      </div>
+
+                      <div className="flex-1 relative min-h-[180px]">
+                        <div className="absolute inset-0 grid grid-cols-12 pointer-events-none opacity-50">
+                          {MONTHS.map((_, i) => (
+                            <div key={i} className="border-r border-slate-100 last:border-r-0" />
+                          ))}
+                        </div>
+
+                        <div className="relative p-8 grid grid-cols-12 gap-y-6 auto-rows-min">
+                          {items
+                            .filter(item => item.productId === product.id)
+                            .map(item => {
+                              const span = Math.min(item.spanMonths || 1, 12 - item.startMonth);
+                              return (
+                                <div
+                                  key={item.id}
+                                  style={{ gridColumn: `${item.startMonth + 1} / span ${span}` }}
+                                  className="transition-all z-10"
+                                  draggable
+                                  onDragStart={() => setDraggedItemId(item.id)}
+                                >
+                                  <CleanItemCard item={item} milestones={milestones} onEdit={() => onEditItem(item)} />
+                                </div>
+                              );
+                            })}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>

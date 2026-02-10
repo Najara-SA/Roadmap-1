@@ -138,12 +138,9 @@ const Sidebar: React.FC<SidebarProps> = ({
             <button
               key={item.id}
               onClick={() => onViewChange(item.id)}
-              className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all group ${activeView === item.id
-                ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-200'
-                : 'text-slate-500 hover:bg-slate-50 hover:text-indigo-600'
-                }`}
+              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 group ${activeView === item.id ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-100 translate-x-1' : 'text-slate-500 hover:bg-indigo-50 hover:text-indigo-600'}`}
             >
-              <item.icon className={`h-5 w-5 ${activeView === item.id ? 'text-white' : 'text-slate-400 group-hover:text-indigo-600'} transition-colors`} />
+              <item.icon className={`h-5 w-5 ${activeView === item.id ? 'text-white' : 'text-slate-400 group-hover:text-indigo-500'}`} />
               <span className="text-[13px] font-bold tracking-tight">{item.label}</span>
             </button>
           ))}

@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, Trash2, Box, Palette } from 'lucide-react';
-import { Product } from '../types';
+import { X, Trash2, Box, Palette, ChevronDown } from 'lucide-react';
+import { Product, Vertical } from '../types';
 import { useTranslation } from '../hooks/useTranslation';
 
 interface ProductModalProps {
@@ -10,6 +10,7 @@ interface ProductModalProps {
   onSave: (product: Product) => void;
   onDelete?: (id: string) => void;
   product?: Product;
+  productFamilies: Vertical[];
 }
 
 const COLORS = [
@@ -17,10 +18,11 @@ const COLORS = [
   'bg-sky-600', 'bg-violet-600', 'bg-slate-700', 'bg-fuchsia-600'
 ];
 
-const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, onDelete, product }) => {
+const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, onDelete, product, productFamilies }) => {
   const { t } = useTranslation();
   const [formData, setFormData] = useState<Product>({
     id: '',
+    familyId: productFamilies[0]?.id || '',
     name: '',
     description: '',
     color: COLORS[0]
@@ -32,12 +34,13 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, on
     } else {
       setFormData({
         id: Math.random().toString(36).substring(2, 9),
+        familyId: productFamilies[0]?.id || '',
         name: '',
         description: '',
         color: COLORS[0]
       });
     }
-  }, [product, isOpen]);
+  }, [product, isOpen, productFamilies]);
 
   if (!isOpen) return null;
 
@@ -60,6 +63,19 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, on
 
         <form onSubmit={(e) => { e.preventDefault(); onSave(formData); }} className="p-10 space-y-8">
           <div className="space-y-6">
+            <div>
+              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('vertical')}</label>
+              <div className="relative">
+                <select
+                  className="w-full px-5 py-3.5 border border-slate-200 rounded-2xl outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                  value={formData.familyId}
+                  onChange={e => setFormData({ ...formData, familyId: e.target.value })}
+                >
+                  {productFamilies.map(f => <option key={f.id} value={f.id}>{f.name}</option>)}
+                </select>
+                <ChevronDown className="absolute right-4 top-4 h-4 w-4 text-slate-400 pointer-events-none" />
+              </div>
+            </div>
             <div>
               <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('product')}</label>
               <input

@@ -10,6 +10,7 @@ import AnalyticsView from './components/AnalyticsView';
 import ItemModal from './components/ItemModal';
 import ProductModal from './components/ProductModal';
 import MilestoneModal from './components/MilestoneModal';
+import ProgressCard from './components/ProgressCard';
 import { RoadmapItem, RoadmapStatus, Priority, ViewType, Vertical, Product, Milestone } from './types';
 import { useTranslation } from './hooks/useTranslation';
 
@@ -89,7 +90,10 @@ const App: React.FC = () => {
         }));
       }
 
-      const cloudProducts = pRes.data || [];
+      const cloudProducts = (pRes.data || []).map((p: any) => ({
+        ...p,
+        familyId: p.family_id
+      }));
       const cloudItems = (iRes.data || []).map((item: any) => ({
         ...item,
         productId: item.product_id,
@@ -229,7 +233,13 @@ const App: React.FC = () => {
     const supabase = getSupabaseClient();
     if (supabase) {
       setSyncStatus('syncing');
-      const { error } = await supabase.from('products').upsert(product);
+      const { error } = await supabase.from('products').upsert({
+        id: product.id,
+        family_id: product.familyId,
+        name: product.name,
+        description: product.description,
+        color: product.color
+      });
       if (error) {
         console.error("Error upserting product:", error);
         setSyncStatus('error');
@@ -402,15 +412,31 @@ const App: React.FC = () => {
           </div>
         </header>
 
+        <div className="p-8 pb-0">
+          <div className="flex items-start justify-between gap-10">
+            <div className="flex-1">
+              <h2 className="text-4xl font-display font-black text-slate-900 tracking-tight mb-2">Roadmap MD</h2>
+              <p className="text-slate-500 font-medium">Controle de Módulos e Famílias de Produtos</p>
+            </div>
+            {items.length > 0 && (
+              <ProgressCard
+                progress={(items.filter(i => i.status === RoadmapStatus.COMPLETED).length / items.length) * 100}
+                label="PROGRESSO GERAL"
+                target="Consolidado de todas as famílias"
+              />
+            )}
+          </div>
+        </div>
+
         <div className="flex-1 overflow-hidden">
-          {activeView === 'portfolio' && <PortfolioView items={items} products={products} milestones={milestones} onEditItem={(item) => { setSelectedItem(item); setIsModalOpen(true); }} onEditProduct={(p) => { setSelectedProduct(p); setIsProductModalOpen(true); }} onEditMilestone={(m) => { setSelectedMilestone(m); setIsMilestoneModalOpen(true); }} onAddMilestone={(pid, m) => { setActiveContext({ productId: pid, month: m }); setSelectedMilestone(undefined); setIsMilestoneModalOpen(true); }} onMoveItem={(id, month) => { const item = items.find(i => i.id === id); if (item) handleUpdateItem({ ...item, startMonth: month }); }} />}
+          {activeView === 'portfolio' && <PortfolioView items={items} products={products} verticals={verticals} milestones={milestones} onEditItem={(item) => { setSelectedItem(item); setIsModalOpen(true); }} onEditProduct={(p) => { setSelectedProduct(p); setIsProductModalOpen(true); }} onEditMilestone={(m) => { setSelectedMilestone(m); setIsMilestoneModalOpen(true); }} onAddMilestone={(pid, m) => { setActiveContext({ productId: pid, month: m }); setSelectedMilestone(undefined); setIsMilestoneModalOpen(true); }} onMoveItem={(id, month) => { const item = items.find(i => i.id === id); if (item) handleUpdateItem({ ...item, startMonth: month }); }} />}
           {activeView === 'timeline' && <div className="p-8 h-full overflow-auto custom-scrollbar"><TimelineView items={items} milestones={milestones} onEditItem={(item) => { setSelectedItem(item); setIsModalOpen(true); }} /></div>}
           {activeView === 'analytics' && <div className="p-8 h-full overflow-auto custom-scrollbar"><AnalyticsView items={items} /></div>}
         </div>
       </main>
 
       {isModalOpen && <ItemModal isOpen={isModalOpen} verticals={verticals} products={products} milestones={milestones} allItems={items} onClose={() => { setIsModalOpen(false); setSelectedItem(undefined); }} onSave={selectedItem ? handleUpdateItem : handleAddItem} onDelete={selectedItem ? () => handleDeleteItem(selectedItem.id) : undefined} item={selectedItem} />}
-      {isProductModalOpen && <ProductModal isOpen={isProductModalOpen} onClose={() => { setIsProductModalOpen(false); setSelectedProduct(undefined); }} onSave={handleSaveProduct} onDelete={selectedProduct ? () => handleDeleteProduct(selectedProduct.id) : undefined} product={selectedProduct} />}
+      {isProductModalOpen && <ProductModal isOpen={isProductModalOpen} productFamilies={verticals} onClose={() => { setIsProductModalOpen(false); setSelectedProduct(undefined); }} onSave={handleSaveProduct} onDelete={selectedProduct ? () => handleDeleteProduct(selectedProduct.id) : undefined} product={selectedProduct} />}
       {isMilestoneModalOpen && <MilestoneModal isOpen={isMilestoneModalOpen} onClose={() => { setIsMilestoneModalOpen(false); setSelectedMilestone(undefined); }} onSave={handleSaveMilestone} onDelete={selectedMilestone ? async () => {
         const next = milestones.filter(m => m.id !== selectedMilestone.id);
         setMilestones(next);

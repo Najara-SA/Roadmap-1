@@ -12,8 +12,10 @@ export enum Priority {
   LOW = 'Low'
 }
 
+// Product is now SubProduct/Module
 export interface Product {
   id: string;
+  familyId: string; // Link to ProductFamily (Vertical)
   name: string;
   description: string;
   color: string;

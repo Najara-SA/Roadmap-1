@@ -30,8 +30,8 @@ const TimelineView: React.FC<TimelineViewProps> = ({ items, milestones, onEditIt
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-full text-[11px] font-black uppercase tracking-[0.2em] mb-6 shadow-sm border border-indigo-100/50">
           <Target className="h-4 w-4" /> {t('strategicSequence')}
         </div>
-        <h2 className="text-5xl font-display font-black text-slate-900 tracking-tight leading-tight">{t('executionRoadmap')}</h2>
-        <p className="text-slate-500 mt-4 text-xl font-medium leading-relaxed max-w-2xl mx-auto">{t('roadmapSubTitle')}</p>
+        <h2 className="text-5xl font-display font-black text-slate-900 tracking-tight leading-tight">{t('strategyMatrix')}</h2>
+        <p className="text-slate-500 mt-4 text-xl font-medium leading-relaxed max-w-2xl mx-auto">Cronograma detalhado por trimestres e módulos.</p>
       </div>
 
       <div className="relative">
