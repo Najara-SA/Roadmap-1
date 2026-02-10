@@ -27,7 +27,7 @@ export interface Milestone {
   description: string;
 }
 
-export interface Team {
+export interface Vertical {
   id: string;
   name: string;
   color: string;
@@ -46,7 +46,7 @@ export interface SubFeature {
 
 export interface RoadmapItem {
   id: string;
-  teamId: string;
+  verticalId: string;
   productId: string;
   milestoneId?: string;
   title: string;

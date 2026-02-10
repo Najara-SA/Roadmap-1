@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { X, Trash2, Box, Flag, Clock, Calendar, ChevronDown, ChevronRight, Plus, CheckCircle2, Circle } from 'lucide-react';
-import { RoadmapItem, RoadmapStatus, Priority, Team, Product, Milestone, SubFeature } from '../types';
+import { RoadmapItem, RoadmapStatus, Priority, Vertical, Product, Milestone, SubFeature } from '../types';
 import { useTranslation } from '../hooks/useTranslation';
 
 interface ItemModalProps {
@@ -10,14 +10,14 @@ interface ItemModalProps {
   onSave: (item: any) => void;
   onDelete?: () => void;
   item?: RoadmapItem;
-  teams: Team[];
+  verticals: Vertical[];
   products: Product[];
   milestones: Milestone[];
   allItems: RoadmapItem[];
 }
 
 const ItemModal: React.FC<ItemModalProps> = ({
-  isOpen, onClose, onSave, onDelete, item, teams, products, milestones
+  isOpen, onClose, onSave, onDelete, item, verticals, products, milestones
 }) => {
   const { t, language } = useTranslation();
 
@@ -34,7 +34,7 @@ const ItemModal: React.FC<ItemModalProps> = ({
     priority: Priority.MEDIUM,
     startMonth: 0,
     spanMonths: 1,
-    teamId: teams[0]?.id || '',
+    verticalId: verticals[0]?.id || '',
     productId: products[0]?.id || '',
     milestoneId: '',
     effort: 3,
@@ -54,7 +54,7 @@ const ItemModal: React.FC<ItemModalProps> = ({
         priority: item.priority,
         startMonth: item.startMonth || 0,
         spanMonths: item.spanMonths || 1,
-        teamId: item.teamId,
+        verticalId: item.verticalId,
         productId: item.productId,
         milestoneId: item.milestoneId || '',
         effort: item.effort,
@@ -62,10 +62,10 @@ const ItemModal: React.FC<ItemModalProps> = ({
         tagsString: (item.tags || []).join(', '),
         subFeatures: item.subFeatures || []
       });
-    } else if (teams.length > 0 && products.length > 0) {
-      setFormData(prev => ({ ...prev, teamId: teams[0].id, productId: products[0].id }));
+    } else if (verticals.length > 0 && products.length > 0) {
+      setFormData(prev => ({ ...prev, verticalId: verticals[0].id, productId: products[0].id }));
     }
-  }, [item, teams, products]);
+  }, [item, verticals, products]);
 
   const addSubFeature = () => {
     if (!newSubFeatureTitle.trim()) return;
@@ -169,6 +169,15 @@ const ItemModal: React.FC<ItemModalProps> = ({
             </div>
 
             <div className="grid grid-cols-2 gap-6">
+              <div>
+                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Vertical</label>
+                <div className="relative">
+                  <select className="w-full px-5 py-3.5 border border-slate-200 rounded-2xl outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all" value={formData.verticalId} onChange={e => setFormData({ ...formData, verticalId: e.target.value })}>
+                    {verticals.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
+                  </select>
+                  <ChevronDown className="absolute right-4 top-4 h-4 w-4 text-slate-400 pointer-events-none" />
+                </div>
+              </div>
               <div>
                 <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('product')}</label>
                 <div className="relative">

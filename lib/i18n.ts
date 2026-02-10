@@ -13,7 +13,6 @@ export const translations = {
 
     // Header & Sidebar
     strategyMatrix: 'Matriz de Estratégia',
-    featureBoard: 'Quadro de Funcionalidades',
     executionTimeline: 'Linha do Tempo',
     insights: 'Insights',
     newTheme: 'Novo Tema',
@@ -41,7 +40,7 @@ export const translations = {
     title: 'Título',
     description: 'Descrição',
     product: 'Produto',
-    team: 'Time',
+    vertical: 'Vertical',
     status: 'Status',
     startDate: 'Mês de Início',
     duration: 'Duração (Meses)',
@@ -79,7 +78,6 @@ export const translations = {
 
     // Header & Sidebar
     strategyMatrix: 'Matriz de Estrategia',
-    featureBoard: 'Tablero de Funciones',
     executionTimeline: 'Línea de Tiempo',
     insights: 'Insights',
     newTheme: 'Novo Tema',
@@ -107,7 +105,7 @@ export const translations = {
     title: 'Título',
     description: 'Descripción',
     product: 'Producto',
-    team: 'Equipo',
+    vertical: 'Vertical',
     status: 'Estado',
     startDate: 'Mes de Inicio',
     duration: 'Duración (Meses)',
@@ -145,7 +143,6 @@ export const translations = {
 
     // Header & Sidebar
     strategyMatrix: 'Strategy Matrix',
-    featureBoard: 'Feature Board',
     executionTimeline: 'Execution Timeline',
     insights: 'Insights',
     newTheme: 'New Theme',
@@ -173,7 +170,7 @@ export const translations = {
     title: 'Title',
     description: 'Description',
     product: 'Product',
-    team: 'Team',
+    vertical: 'Vertical',
     status: 'Status',
     startDate: 'Start Month',
     duration: 'Duration (Months)',

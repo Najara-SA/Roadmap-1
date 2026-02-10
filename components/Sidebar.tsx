@@ -10,34 +10,57 @@ import {
   Link2,
   Users,
   ChevronDown,
-  LayoutGrid
+  LayoutGrid,
+  Plus,
+  Settings2,
+  Check,
+  MoreVertical
 } from 'lucide-react';
-import { ViewType, Team } from '../types';
+import { ViewType, Vertical } from '../types';
 import { useTranslation } from '../hooks/useTranslation';
 
 interface SidebarProps {
   activeView: ViewType;
   onViewChange: (view: ViewType) => void;
-  teams: Team[];
-  activeTeamId: string;
-  onTeamChange: (id: string) => void;
+  verticals: Vertical[];
+  activeVerticalId: string;
+  onVerticalChange: (id: string) => void;
+  onUpdateVerticals: (verticals: Vertical[]) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
   activeView,
   onViewChange,
-  teams,
-  activeTeamId,
-  onTeamChange
+  verticals,
+  activeVerticalId,
+  onVerticalChange,
+  onUpdateVerticals
 }) => {
   const { t } = useTranslation();
+  const [isEditingVerticals, setIsEditingVerticals] = React.useState(false);
+  const [newVerticalName, setNewVerticalName] = React.useState('');
 
   const navItems = [
     { id: 'portfolio' as ViewType, label: t('strategyMatrix'), icon: LayoutGrid },
-    { id: 'board' as ViewType, label: t('featureBoard'), icon: LayoutDashboard },
     { id: 'timeline' as ViewType, label: t('executionTimeline'), icon: CalendarRange },
     { id: 'analytics' as ViewType, label: t('insights'), icon: BarChart3 },
   ];
+
+  const handleAddVertical = () => {
+    if (!newVerticalName.trim()) return;
+    const newV: Vertical = {
+      id: Math.random().toString(36).substring(2, 9),
+      name: newVerticalName,
+      color: 'bg-slate-500' // Default
+    };
+    onUpdateVerticals([...verticals, newV]);
+    setNewVerticalName('');
+  };
+
+  const handleRemoveVertical = (id: string) => {
+    onUpdateVerticals(verticals.filter(v => v.id !== id));
+    if (activeVerticalId === id) onVerticalChange('all');
+  };
 
   return (
     <aside className="w-64 bg-white border-r border-slate-200/60 flex flex-col flex-shrink-0 z-30">
@@ -53,21 +76,59 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         <div className="mb-10">
-          <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3 ml-1">Context</label>
-          <div className="relative group">
-            <select
-              value={activeTeamId}
-              onChange={(e) => onTeamChange(e.target.value)}
-              className="w-full pl-10 pr-8 py-3 text-xs font-bold text-slate-700 bg-slate-50/50 border border-slate-200 rounded-2xl appearance-none focus:outline-none focus:ring-4 focus:ring-indigo-500/10 cursor-pointer transition-all hover:bg-white"
+          <div className="flex items-center justify-between mb-3 ml-1">
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Context</label>
+            <button
+              onClick={() => setIsEditingVerticals(!isEditingVerticals)}
+              className="text-[10px] font-bold text-indigo-500 hover:text-indigo-600 transition-colors uppercase tracking-widest"
             >
-              <option value="all">Enterprise-wide</option>
-              {teams.map(team => (
-                <option key={team.id} value={team.id}>{team.name}</option>
-              ))}
-            </select>
-            <Users className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
-            <ChevronDown className="absolute right-3.5 top-4 h-3 w-3 text-slate-400 pointer-events-none group-hover:translate-y-0.5 transition-transform" />
+              {isEditingVerticals ? 'Done' : 'Manage'}
+            </button>
           </div>
+
+          {!isEditingVerticals ? (
+            <div className="relative group">
+              <select
+                value={activeVerticalId}
+                onChange={(e) => onVerticalChange(e.target.value)}
+                className="w-full pl-10 pr-8 py-3 text-xs font-bold text-slate-700 bg-slate-50/50 border border-slate-200 rounded-2xl appearance-none focus:outline-none focus:ring-4 focus:ring-indigo-500/10 cursor-pointer transition-all hover:bg-white"
+              >
+                <option value="all">Enterprise-wide</option>
+                {verticals.map(v => (
+                  <option key={v.id} value={v.id}>{v.name}</option>
+                ))}
+              </select>
+              <Users className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
+              <ChevronDown className="absolute right-3.5 top-4 h-3 w-3 text-slate-400 pointer-events-none group-hover:translate-y-0.5 transition-transform" />
+            </div>
+          ) : (
+            <div className="space-y-2 animate-in fade-in duration-300">
+              {verticals.map(v => (
+                <div key={v.id} className="flex items-center gap-2 px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl group">
+                  <span className="flex-1 text-[11px] font-bold text-slate-700 truncate">{v.name}</span>
+                  <button onClick={() => handleRemoveVertical(v.id)} className="opacity-0 group-hover:opacity-100 p-1 hover:bg-rose-50 text-slate-300 hover:text-rose-500 rounded-lg transition-all">
+                    <MoreVertical className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+              <div className="flex gap-2 pt-1">
+                <input
+                  type="text"
+                  placeholder="New vertical..."
+                  className="flex-1 px-3 py-2 text-[11px] font-bold border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                  value={newVerticalName}
+                  onChange={(e) => setNewVerticalName(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleAddVertical()}
+                />
+                <button
+                  onClick={handleAddVertical}
+                  className="p-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         <nav className="space-y-2">

@@ -4,14 +4,13 @@ import { Search, Plus, Layers, CloudCheck, RefreshCw, Database, AlertTriangle, L
 import { getSupabaseClient, isSupabaseReady } from './lib/supabase';
 import { localDB } from './lib/persistence';
 import Sidebar from './components/Sidebar';
-import RoadmapBoard from './components/RoadmapBoard';
 import TimelineView from './components/TimelineView';
 import PortfolioView from './components/PortfolioView';
 import AnalyticsView from './components/AnalyticsView';
 import ItemModal from './components/ItemModal';
 import ProductModal from './components/ProductModal';
 import MilestoneModal from './components/MilestoneModal';
-import { RoadmapItem, RoadmapStatus, Priority, ViewType, Team, Product, Milestone } from './types';
+import { RoadmapItem, RoadmapStatus, Priority, ViewType, Vertical, Product, Milestone } from './types';
 import { useTranslation } from './hooks/useTranslation';
 
 const getQuarterFromMonth = (month: number) => `Q${Math.floor(month / 3) + 1} 2024`;
@@ -22,12 +21,11 @@ const App: React.FC = () => {
   const [items, setItems] = useState<RoadmapItem[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
-  const [teams] = useState<Team[]>([
-    { id: 't1', name: 'Core Backend', color: 'bg-indigo-500' },
-    { id: 't2', name: 'Mobile Platform', color: 'bg-violet-500' },
-    { id: 't3', name: 'UX/Frontend', color: 'bg-fuchsia-500' },
+  const [verticals, setVerticals] = useState<Vertical[]>([
+    { id: 'v1', name: 'Plataforma Core', color: 'bg-indigo-500' },
+    { id: 'v2', name: 'Expansão Global', color: 'bg-violet-500' },
   ]);
-  const [activeTeamId, setActiveTeamId] = useState<string>('all');
+  const [activeVerticalId, setActiveVerticalId] = useState<string>('all');
   const [syncStatus, setSyncStatus] = useState<'synced' | 'syncing' | 'error' | 'offline'>('offline');
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -75,7 +73,7 @@ const App: React.FC = () => {
       const cloudItems = (iRes.data || []).map((item: any) => ({
         ...item,
         productId: item.product_id,
-        teamId: item.team_id,
+        verticalId: item.team_id || item.vertical_id,
         startMonth: item.start_month,
         spanMonths: item.span_months,
         subFeatures: item.sub_features || []
@@ -121,7 +119,7 @@ const App: React.FC = () => {
       const { error } = await supabase.from('roadmap_items').upsert({
         id: updatedItem.id,
         product_id: updatedItem.productId,
-        team_id: updatedItem.teamId,
+        team_id: updatedItem.verticalId,
         title: updatedItem.title,
         description: updatedItem.description,
         status: updatedItem.status,
@@ -246,7 +244,7 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-slate-50/30 overflow-hidden font-sans selection:bg-indigo-100 selection:text-indigo-900">
-      <Sidebar activeView={activeView} onViewChange={setActiveView} teams={teams} activeTeamId={activeTeamId} onTeamChange={setActiveTeamId} />
+      <Sidebar activeView={activeView} onViewChange={setActiveView} verticals={verticals} activeVerticalId={activeVerticalId} onVerticalChange={setActiveVerticalId} onUpdateVerticals={setVerticals} />
 
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <header className="h-20 bg-white/70 backdrop-blur-xl border-b border-slate-200/60 flex items-center justify-between px-8 z-20 sticky top-0">
@@ -256,7 +254,7 @@ const App: React.FC = () => {
                 <Layers className="h-5 w-5 text-white" />
               </div>
               <h1 className="text-xl font-display font-bold text-slate-900 tracking-tight">
-                {activeView === 'portfolio' ? t('strategyMatrix') : activeView === 'board' ? t('featureBoard') : activeView === 'timeline' ? t('executionTimeline') : t('insights')}
+                {activeView === 'portfolio' ? t('strategyMatrix') : activeView === 'timeline' ? t('executionTimeline') : t('insights')}
               </h1>
             </div>
 
@@ -327,13 +325,12 @@ const App: React.FC = () => {
 
         <div className="flex-1 overflow-hidden">
           {activeView === 'portfolio' && <PortfolioView items={items} products={products} milestones={milestones} onEditItem={(item) => { setSelectedItem(item); setIsModalOpen(true); }} onEditProduct={(p) => { setSelectedProduct(p); setIsProductModalOpen(true); }} onEditMilestone={(m) => { setSelectedMilestone(m); setIsMilestoneModalOpen(true); }} onAddMilestone={(pid, m) => { setActiveContext({ productId: pid, month: m }); setSelectedMilestone(undefined); setIsMilestoneModalOpen(true); }} onMoveItem={(id, month) => { const item = items.find(i => i.id === id); if (item) handleUpdateItem({ ...item, startMonth: month }); }} />}
-          {activeView === 'board' && <div className="p-8 h-full overflow-auto custom-scrollbar"><RoadmapBoard items={items} teams={teams} onEditItem={(item) => { setSelectedItem(item); setIsModalOpen(true); }} onMoveItem={(id, newStatus) => { const item = items.find(i => i.id === id); if (item) handleUpdateItem({ ...item, status: newStatus }) }} /></div>}
           {activeView === 'timeline' && <div className="p-8 h-full overflow-auto custom-scrollbar"><TimelineView items={items} onEditItem={(item) => { setSelectedItem(item); setIsModalOpen(true); }} /></div>}
           {activeView === 'analytics' && <div className="p-8 h-full overflow-auto custom-scrollbar"><AnalyticsView items={items} /></div>}
         </div>
       </main>
 
-      {isModalOpen && <ItemModal isOpen={isModalOpen} teams={teams} products={products} milestones={milestones} allItems={items} onClose={() => { setIsModalOpen(false); setSelectedItem(undefined); }} onSave={selectedItem ? handleUpdateItem : handleAddItem} onDelete={selectedItem ? () => handleDeleteItem(selectedItem.id) : undefined} item={selectedItem} />}
+      {isModalOpen && <ItemModal isOpen={isModalOpen} verticals={verticals} products={products} milestones={milestones} allItems={items} onClose={() => { setIsModalOpen(false); setSelectedItem(undefined); }} onSave={selectedItem ? handleUpdateItem : handleAddItem} onDelete={selectedItem ? () => handleDeleteItem(selectedItem.id) : undefined} item={selectedItem} />}
       {isProductModalOpen && <ProductModal isOpen={isProductModalOpen} onClose={() => { setIsProductModalOpen(false); setSelectedProduct(undefined); }} onSave={handleSaveProduct} onDelete={selectedProduct ? () => handleDeleteProduct(selectedProduct.id) : undefined} product={selectedProduct} />}
       {isMilestoneModalOpen && <MilestoneModal isOpen={isMilestoneModalOpen} onClose={() => { setIsMilestoneModalOpen(false); setSelectedMilestone(undefined); }} onSave={handleSaveMilestone} onDelete={selectedMilestone ? async () => {
         const next = milestones.filter(m => m.id !== selectedMilestone.id);
