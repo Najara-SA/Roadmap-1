@@ -119,7 +119,7 @@ const ItemModal: React.FC<ItemModalProps> = ({
           <div className="space-y-8">
             <div>
               <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('title')}</label>
-              <input required type="text" className="w-full px-6 py-4 border border-slate-200 rounded-3xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 outline-none transition-all font-bold text-slate-900 text-lg placeholder:text-slate-300 shadow-sm" placeholder="Ex: Cloud Sync Infrastructure..." value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
+              <input required type="text" className="w-full px-6 py-4 border border-slate-200 rounded-3xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 outline-none transition-all font-bold text-slate-900 text-lg placeholder:text-slate-300 shadow-sm" placeholder={t('titlePlaceholder')} value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
             </div>
 
             <div>
@@ -157,7 +157,7 @@ const ItemModal: React.FC<ItemModalProps> = ({
                 <input
                   type="text"
                   className="flex-1 px-5 py-3 text-sm border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/5 outline-none transition-all placeholder:text-slate-300"
-                  placeholder="Add detailed requirement..."
+                  placeholder={t('requirementPlaceholder')}
                   value={newSubFeatureTitle}
                   onChange={e => setNewSubFeatureTitle(e.target.value)}
                   onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), addSubFeature())}
@@ -170,7 +170,7 @@ const ItemModal: React.FC<ItemModalProps> = ({
 
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Vertical</label>
+                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('vertical')}</label>
                 <div className="relative">
                   <select className="w-full px-5 py-3.5 border border-slate-200 rounded-2xl outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all" value={formData.verticalId} onChange={e => setFormData({ ...formData, verticalId: e.target.value })}>
                     {verticals.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
@@ -203,7 +203,7 @@ const ItemModal: React.FC<ItemModalProps> = ({
                 <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('duration')}</label>
                 <div className="relative">
                   <select className="w-full px-5 py-3.5 border border-slate-200 rounded-2xl outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all" value={formData.spanMonths} onChange={e => setFormData({ ...formData, spanMonths: parseInt(e.target.value) })}>
-                    {[1, 2, 3, 4, 5, 6].map(v => <option key={v} value={v}>{v} {v === 1 ? 'Month' : 'Months'}</option>)}
+                    {[1, 2, 3, 4, 5, 6].map(v => <option key={v} value={v}>{v} {v === 1 ? t('monthUnit') : t('monthsUnit')}</option>)}
                   </select>
                   <ChevronDown className="absolute right-4 top-4 h-4 w-4 text-slate-400 pointer-events-none" />
                 </div>
@@ -221,7 +221,7 @@ const ItemModal: React.FC<ItemModalProps> = ({
 
             <div>
               <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('tags')}</label>
-              <input type="text" className="w-full px-6 py-4 border border-slate-200 rounded-3xl outline-none bg-slate-50/50 text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 transition-all font-bold placeholder:text-slate-300" placeholder="cloud, infra, analytics, backend..." value={formData.tagsString} onChange={e => setFormData({ ...formData, tagsString: e.target.value })} />
+              <input type="text" className="w-full px-6 py-4 border border-slate-200 rounded-3xl outline-none bg-slate-50/50 text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 transition-all font-bold placeholder:text-slate-300" placeholder={t('tagsPlaceholder')} value={formData.tagsString} onChange={e => setFormData({ ...formData, tagsString: e.target.value })} />
             </div>
           </div>
         </form>

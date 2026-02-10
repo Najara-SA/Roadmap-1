@@ -68,7 +68,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, on
                 className="w-full px-6 py-4 border border-slate-200 rounded-[1.5rem] focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 outline-none transition-all font-bold text-slate-900 text-lg shadow-sm placeholder:text-slate-300"
                 value={formData.name}
                 onChange={e => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Product Name..."
+                placeholder={t('productPlaceholder')}
               />
             </div>
 
@@ -79,12 +79,12 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, on
                 rows={3}
                 value={formData.description}
                 onChange={e => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Short description of the product purpose..."
+                placeholder={t('descriptionPlaceholder')}
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 ml-1">PORTFOLIO BRANDING</label>
+              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 ml-1">{t('branding')}</label>
               <div className="grid grid-cols-4 gap-4">
                 {COLORS.map(c => (
                   <button

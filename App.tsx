@@ -65,6 +65,11 @@ const App: React.FC = () => {
         supabase.from('teams').select('*').order('name')
       ]);
 
+      if (pRes.error) console.error("Products error:", pRes.error);
+      if (iRes.error) console.error("Items error:", iRes.error);
+      if (mRes.error) console.error("Milestones error:", mRes.error);
+      if (tRes.error) console.error("Teams error:", tRes.error);
+
       if (pRes.error || iRes.error || mRes.error || tRes.error) throw new Error('Cloud sync failed');
 
       const cloudVerticals = (tRes.data || []).map((t: any) => ({

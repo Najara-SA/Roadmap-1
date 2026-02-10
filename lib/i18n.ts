@@ -71,6 +71,14 @@ export const translations = {
     businessValue: 'Valor de Negócio',
     lowComplexity: 'Baixa Complexidade',
     highComplexity: 'Alta Complexidade',
+    productPlaceholder: 'Nome do Produto...',
+    descriptionPlaceholder: 'Breve descrição...',
+    branding: 'IDENTIDADE VISUAL',
+    requirementPlaceholder: 'Adicionar requisito detalhado...',
+    monthUnit: 'Mês',
+    monthsUnit: 'Meses',
+    titlePlaceholder: 'Ex: Infra de Sincronização...',
+    tagsPlaceholder: 'nuvem, infra, banco...',
   },
   es: {
     // Shared
@@ -141,6 +149,14 @@ export const translations = {
     businessValue: 'Valor de Negocio',
     lowComplexity: 'Baja Complejidad',
     highComplexity: 'Alta Complejidad',
+    productPlaceholder: 'Nombre del Producto...',
+    descriptionPlaceholder: 'Breve descripción...',
+    branding: 'IDENTIDAD VISUAL',
+    requirementPlaceholder: 'Añadir requisito detallado...',
+    monthUnit: 'Mes',
+    monthsUnit: 'Meses',
+    titlePlaceholder: 'Ej: Infra de Sincronización...',
+    tagsPlaceholder: 'nube, infra, base...',
   },
   en: {
     // Shared
@@ -211,5 +227,13 @@ export const translations = {
     businessValue: 'Business Value',
     lowComplexity: 'Low Complexity',
     highComplexity: 'High Complexity',
+    productPlaceholder: 'Product Name...',
+    descriptionPlaceholder: 'Short description...',
+    branding: 'PORTFOLIO BRANDING',
+    requirementPlaceholder: 'Add detailed requirement...',
+    monthUnit: 'Month',
+    monthsUnit: 'Months',
+    titlePlaceholder: 'Ex: Sync Infrastructure...',
+    tagsPlaceholder: 'cloud, infra, db...',
   }
 };
