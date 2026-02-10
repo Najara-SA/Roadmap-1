@@ -30,6 +30,7 @@ interface SidebarProps {
   onDeleteVertical: (id: string) => void;
   overallProgress: number;
   quarterProgress: number;
+  onOpenSettings: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -41,32 +42,16 @@ const Sidebar: React.FC<SidebarProps> = ({
   onAddVertical,
   onDeleteVertical,
   overallProgress,
-  quarterProgress
+  quarterProgress,
+  onOpenSettings
 }) => {
   const { t } = useTranslation();
-  const [isEditingVerticals, setIsEditingVerticals] = React.useState(false);
-  const [newVerticalName, setNewVerticalName] = React.useState('');
 
   const navItems = [
     { id: 'portfolio' as ViewType, label: t('strategyMatrix'), icon: LayoutGrid },
     { id: 'timeline' as ViewType, label: t('executionTimeline'), icon: CalendarRange },
     { id: 'analytics' as ViewType, label: t('insights'), icon: BarChart3 },
   ];
-
-  const handleAddVertical = () => {
-    if (!newVerticalName.trim()) return;
-    const newV: Vertical = {
-      id: Math.random().toString(36).substring(2, 9),
-      name: newVerticalName,
-      color: 'bg-indigo-500' // Default color
-    };
-    onAddVertical(newV);
-    setNewVerticalName('');
-  };
-
-  const handleRemoveVertical = (id: string) => {
-    onDeleteVertical(id);
-  };
 
   return (
     <aside className="w-64 bg-white border-r border-slate-200/60 flex flex-col flex-shrink-0 z-30">
@@ -82,59 +67,21 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         <div className="mb-10">
-          <div className="flex items-center justify-between mb-4 ml-1">
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] leading-none font-display">{t('context')}</label>
-            <button
-              onClick={() => setIsEditingVerticals(!isEditingVerticals)}
-              className="text-[10px] font-black text-indigo-500 hover:text-indigo-600 transition-all uppercase tracking-widest bg-indigo-50 px-2 py-1 rounded-lg"
+          <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] leading-none font-display mb-4 ml-1">{t('context')}</label>
+          <div className="relative group">
+            <select
+              value={activeVerticalId}
+              onChange={(e) => onVerticalChange(e.target.value)}
+              className="w-full pl-10 pr-8 py-4 text-[13px] font-bold text-slate-700 bg-slate-50 border border-slate-200/50 rounded-2xl appearance-none focus:outline-none focus:ring-4 focus:ring-indigo-500/10 cursor-pointer transition-all hover:bg-white hover:border-indigo-200/50 shadow-sm"
             >
-              {isEditingVerticals ? t('done') : t('manage')}
-            </button>
-          </div>
-
-          {!isEditingVerticals ? (
-            <div className="relative group">
-              <select
-                value={activeVerticalId}
-                onChange={(e) => onVerticalChange(e.target.value)}
-                className="w-full pl-10 pr-8 py-4 text-[13px] font-bold text-slate-700 bg-slate-50 border border-slate-200/50 rounded-2xl appearance-none focus:outline-none focus:ring-4 focus:ring-indigo-500/10 cursor-pointer transition-all hover:bg-white hover:border-indigo-200/50 shadow-sm"
-              >
-                <option value="all">{t('all')}</option>
-                {verticals.map(v => (
-                  <option key={v.id} value={v.id}>{v.name}</option>
-                ))}
-              </select>
-              <Users className="absolute left-3.5 top-4 h-4 w-4 text-slate-400" />
-              <ChevronDown className="absolute right-3.5 top-5 h-3 w-3 text-slate-400 pointer-events-none group-hover:translate-y-0.5 transition-transform" />
-            </div>
-          ) : (
-            <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+              <option value="all">{t('all')}</option>
               {verticals.map(v => (
-                <div key={v.id} className="flex items-center gap-2 pr-2 pl-3 py-2 bg-slate-50/50 border border-slate-200/40 rounded-xl group hover:border-rose-100 transition-all">
-                  <span className="flex-1 text-[12px] font-bold text-slate-700 truncate">{v.name}</span>
-                  <button onClick={() => handleRemoveVertical(v.id)} className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-rose-50 text-slate-300 hover:text-rose-500 rounded-lg transition-all active:scale-90">
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                </div>
+                <option key={v.id} value={v.id}>{v.name}</option>
               ))}
-              <div className="flex gap-2 pt-2">
-                <input
-                  type="text"
-                  placeholder={t('newVerticalTitle')}
-                  className="flex-1 px-4 py-2.5 text-[12px] font-medium border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-200 transition-all"
-                  value={newVerticalName}
-                  onChange={(e) => setNewVerticalName(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleAddVertical()}
-                />
-                <button
-                  onClick={handleAddVertical}
-                  className="p-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 active:scale-95"
-                >
-                  <Plus className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          )}
+            </select>
+            <Users className="absolute left-3.5 top-4 h-4 w-4 text-slate-400" />
+            <ChevronDown className="absolute right-3.5 top-5 h-3 w-3 text-slate-400 pointer-events-none group-hover:translate-y-0.5 transition-transform" />
+          </div>
         </div>
 
         <nav className="space-y-1.5">
@@ -183,9 +130,9 @@ const Sidebar: React.FC<SidebarProps> = ({
           <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
         </div>
 
-        <button className="w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold text-slate-400 hover:text-indigo-600 transition-all uppercase tracking-widest hover:bg-indigo-50 rounded-2xl">
+        <button onClick={onOpenSettings} className="w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold text-slate-400 hover:text-indigo-600 transition-all uppercase tracking-widest hover:bg-indigo-50 rounded-2xl">
           <Settings className="h-4 w-4" />
-          {activeView === 'portfolio' ? 'System Configuration' : 'Settings'}
+          {t('systemConfiguration')}
         </button>
       </div>
     </aside>

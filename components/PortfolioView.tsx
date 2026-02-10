@@ -217,6 +217,19 @@ const CleanItemCard: React.FC<{ item: RoadmapItem; milestones: Milestone[]; onEd
           </div>
         )}
 
+        {item.tags && item.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-2">
+            {item.tags.slice(0, 2).map((tag, idx) => (
+              <span key={idx} className="px-1.5 py-0.5 bg-slate-100 text-slate-600 text-[8px] font-bold rounded uppercase tracking-wide">
+                {tag}
+              </span>
+            ))}
+            {item.tags.length > 2 && (
+              <span className="px-1.5 py-0.5 bg-slate-200 text-slate-500 text-[8px] font-bold rounded">+{item.tags.length - 2}</span>
+            )}
+          </div>
+        )}
+
         {totalCount > 0 && (
           <div className="flex items-center gap-2">
             <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden shadow-inner">
