@@ -323,6 +323,19 @@ const App: React.FC = () => {
     await localDB.save('visionpath_data', { items, products, milestones, verticals: nextVerticals });
   };
 
+  const filteredByFamily = activeVerticalId === 'all'
+    ? items
+    : items.filter(i => i.verticalId === activeVerticalId);
+
+  const overallProgress = filteredByFamily.length > 0
+    ? (filteredByFamily.filter(i => i.status === RoadmapStatus.COMPLETED).length / filteredByFamily.length) * 100
+    : 0;
+
+  const q1Items = filteredByFamily.filter(i => i.quarter === 'Q1 2024');
+  const q1Progress = q1Items.length > 0
+    ? (q1Items.filter(i => i.status === RoadmapStatus.COMPLETED).length / q1Items.length) * 100
+    : 0;
+
   return (
     <div className="flex h-screen bg-slate-50/30 overflow-hidden font-sans selection:bg-indigo-100 selection:text-indigo-900">
       <Sidebar
@@ -333,6 +346,8 @@ const App: React.FC = () => {
         onVerticalChange={setActiveVerticalId}
         onAddVertical={handleSaveVertical}
         onDeleteVertical={handleDeleteVertical}
+        overallProgress={overallProgress}
+        quarterProgress={q1Progress}
       />
 
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
@@ -411,22 +426,6 @@ const App: React.FC = () => {
             </div>
           </div>
         </header>
-
-        <div className="p-8 pb-0">
-          <div className="flex items-start justify-between gap-10">
-            <div className="flex-1">
-              <h2 className="text-4xl font-display font-black text-slate-900 tracking-tight mb-2">Roadmap MD</h2>
-              <p className="text-slate-500 font-medium">Controle de Módulos e Famílias de Produtos</p>
-            </div>
-            {items.length > 0 && (
-              <ProgressCard
-                progress={(items.filter(i => i.status === RoadmapStatus.COMPLETED).length / items.length) * 100}
-                label="PROGRESSO GERAL"
-                target="Consolidado de todas as famílias"
-              />
-            )}
-          </div>
-        </div>
 
         <div className="flex-1 overflow-hidden">
           {activeView === 'portfolio' && <PortfolioView items={items} products={products} verticals={verticals} milestones={milestones} onEditItem={(item) => { setSelectedItem(item); setIsModalOpen(true); }} onEditProduct={(p) => { setSelectedProduct(p); setIsProductModalOpen(true); }} onEditMilestone={(m) => { setSelectedMilestone(m); setIsMilestoneModalOpen(true); }} onAddMilestone={(pid, m) => { setActiveContext({ productId: pid, month: m }); setSelectedMilestone(undefined); setIsMilestoneModalOpen(true); }} onMoveItem={(id, month) => { const item = items.find(i => i.id === id); if (item) handleUpdateItem({ ...item, startMonth: month }); }} />}

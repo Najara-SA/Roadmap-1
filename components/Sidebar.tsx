@@ -28,6 +28,8 @@ interface SidebarProps {
   onVerticalChange: (id: string) => void;
   onAddVertical: (vertical: Vertical) => void;
   onDeleteVertical: (id: string) => void;
+  overallProgress: number;
+  quarterProgress: number;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -37,7 +39,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   activeVerticalId,
   onVerticalChange,
   onAddVertical,
-  onDeleteVertical
+  onDeleteVertical,
+  overallProgress,
+  quarterProgress
 }) => {
   const { t } = useTranslation();
   const [isEditingVerticals, setIsEditingVerticals] = React.useState(false);
@@ -72,8 +76,8 @@ const Sidebar: React.FC<SidebarProps> = ({
             <Layers className="h-6 w-6" />
           </div>
           <div>
-            <h2 className="font-display font-black text-slate-900 leading-none text-xl tracking-tight">VisionPath</h2>
-            <p className="text-[10px] text-indigo-600/80 font-bold uppercase tracking-[0.2em] mt-1 italic">Roadmap</p>
+            <h2 className="font-display font-black text-slate-900 leading-none text-xl tracking-tight">Roadmap MD</h2>
+            <p className="text-[10px] text-indigo-600/80 font-bold uppercase tracking-[0.2em] mt-1 italic">Product Vision</p>
           </div>
         </div>
 
@@ -148,14 +152,33 @@ const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       <div className="mt-auto p-8 space-y-4">
+        {/* Q1 Progress Card */}
+        <div className="p-6 bg-indigo-50 border border-indigo-100/50 rounded-3xl group transition-all">
+          <div className="flex items-center gap-2.5 mb-4">
+            <Target className="h-4 w-4 text-indigo-500" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600">Q1 Progress</span>
+          </div>
+          <p className="text-[11px] font-bold leading-relaxed mb-4 text-slate-500">{activeVerticalId === 'all' ? 'All Families' : verticals.find(v => v.id === activeVerticalId)?.name}</p>
+          <div className="bg-slate-200/50 h-1.5 rounded-full overflow-hidden">
+            <div className="bg-indigo-500 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(99,102,241,0.3)]" style={{ width: `${quarterProgress}%` }}></div>
+          </div>
+          <div className="mt-2 text-right">
+            <span className="text-[10px] font-black text-indigo-600">{Math.round(quarterProgress)}%</span>
+          </div>
+        </div>
+
+        {/* Overall Progress Card (Purple Premium) */}
         <div className="p-6 bg-gradient-to-br from-indigo-600 to-violet-700 rounded-3xl text-white shadow-2xl shadow-indigo-100 relative overflow-hidden group">
           <div className="flex items-center gap-2.5 mb-4">
             <Target className="h-4 w-4 text-indigo-200" />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-100">Q1 Progress</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-100">Progresso Geral</span>
           </div>
-          <p className="text-[11px] font-bold leading-relaxed mb-4 text-white/90">Target: Core UI Refinement</p>
+          <p className="text-[11px] font-bold leading-relaxed mb-4 text-white/90">Consolidado da Família</p>
           <div className="bg-white/20 h-1.5 rounded-full overflow-hidden">
-            <div className="bg-emerald-400 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(52,211,153,0.5)]" style={{ width: '85%' }}></div>
+            <div className="bg-emerald-400 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(52,211,153,0.5)]" style={{ width: `${overallProgress}%` }}></div>
+          </div>
+          <div className="mt-2 text-right">
+            <span className="text-[10px] font-black text-white">{Math.round(overallProgress)}%</span>
           </div>
           <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
         </div>
