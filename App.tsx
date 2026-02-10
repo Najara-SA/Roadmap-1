@@ -29,12 +29,12 @@ const App: React.FC = () => {
   ]);
   const [activeTeamId, setActiveTeamId] = useState<string>('all');
   const [syncStatus, setSyncStatus] = useState<'synced' | 'syncing' | 'error' | 'offline'>('offline');
-  
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isMilestoneModalOpen, setIsMilestoneModalOpen] = useState(false);
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
-  
+
   const [selectedItem, setSelectedItem] = useState<RoadmapItem | undefined>(undefined);
   const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined);
   const [selectedMilestone, setSelectedMilestone] = useState<Milestone | undefined>(undefined);
@@ -84,7 +84,7 @@ const App: React.FC = () => {
       setProducts(cloudProducts);
       setItems(cloudItems);
       setMilestones(cloudMilestones);
-      
+
       // Salvar versão da nuvem no banco local para futuras sessões offline
       await localDB.save('visionpath_data', { items: cloudItems, products: cloudProducts, milestones: cloudMilestones });
       setSyncStatus('synced');
@@ -101,7 +101,7 @@ const App: React.FC = () => {
   const persistChanges = async (newItems: RoadmapItem[], newProducts: Product[], newMilestones: Milestone[]) => {
     // Banco Local primeiro (Segurança total)
     await localDB.save('visionpath_data', { items: newItems, products: newProducts, milestones: newMilestones });
-    
+
     // Cloud Sync (Segundo plano)
     const supabase = getSupabaseClient();
     if (supabase) {
@@ -113,10 +113,10 @@ const App: React.FC = () => {
   };
 
   const handleUpdateItem = async (updatedItem: RoadmapItem) => {
-    const nextItems = items.some(i => i.id === updatedItem.id) 
+    const nextItems = items.some(i => i.id === updatedItem.id)
       ? items.map(i => i.id === updatedItem.id ? updatedItem : i)
       : [...items, updatedItem];
-    
+
     setItems(nextItems);
     setIsModalOpen(false);
 
@@ -143,9 +143,9 @@ const App: React.FC = () => {
   };
 
   const handleAddItem = async (item: any) => {
-    const newItem = { 
-      ...item, 
-      id: Math.random().toString(36).substring(2, 9), 
+    const newItem = {
+      ...item,
+      id: Math.random().toString(36).substring(2, 9),
       createdAt: Date.now(),
       quarter: getQuarterFromMonth(item.startMonth)
     };
@@ -165,10 +165,10 @@ const App: React.FC = () => {
   };
 
   const handleSaveProduct = async (product: Product) => {
-    const nextProducts = products.some(p => p.id === product.id) 
-      ? products.map(p => p.id === product.id ? product : p) 
+    const nextProducts = products.some(p => p.id === product.id)
+      ? products.map(p => p.id === product.id ? product : p)
       : [...products, product];
-    
+
     setProducts(nextProducts);
     setIsProductModalOpen(false);
 
@@ -183,7 +183,7 @@ const App: React.FC = () => {
     const nextMilestones = milestones.some(m => m.id === milestone.id)
       ? milestones.map(m => m.id === milestone.id ? milestone : m)
       : [...milestones, milestone];
-    
+
     setMilestones(nextMilestones);
     setIsMilestoneModalOpen(false);
 
@@ -211,12 +211,11 @@ const App: React.FC = () => {
               <input type="text" placeholder="Search resources..." className="block w-full pl-11 pr-4 py-2.5 border border-gray-100 rounded-2xl text-[11px] font-semibold bg-gray-50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/5 transition-all" />
             </div>
           </div>
-          
+
           <div className="flex items-center gap-6">
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all ${
-              syncStatus === 'synced' ? 'bg-emerald-50 border-emerald-100' : 
-              syncStatus === 'offline' ? 'bg-gray-50 border-gray-200' : 'bg-red-50 border-red-100'
-            }`}>
+            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all ${syncStatus === 'synced' ? 'bg-emerald-50 border-emerald-100' :
+                syncStatus === 'offline' ? 'bg-gray-50 border-gray-200' : 'bg-red-50 border-red-100'
+              }`}>
               {syncStatus === 'syncing' ? (
                 <RefreshCw className="h-3 w-3 text-indigo-500 animate-spin" />
               ) : syncStatus === 'synced' ? (
@@ -226,27 +225,26 @@ const App: React.FC = () => {
               ) : (
                 <AlertTriangle className="h-3 w-3 text-red-500" />
               )}
-              <span className={`text-[9px] font-black uppercase tracking-widest ${
-                syncStatus === 'synced' ? 'text-emerald-600' : 
-                syncStatus === 'offline' ? 'text-gray-400' : 'text-red-500'
-              }`}>
+              <span className={`text-[9px] font-black uppercase tracking-widest ${syncStatus === 'synced' ? 'text-emerald-600' :
+                  syncStatus === 'offline' ? 'text-gray-400' : 'text-red-500'
+                }`}>
                 {syncStatus === 'syncing' ? 'Syncing...' : syncStatus === 'synced' ? 'Supabase Live' : syncStatus === 'offline' ? 'Local Safe' : 'Conn Error'}
               </span>
             </div>
-            
+
             <div className="flex items-center gap-3">
-              <button onClick={() => setIsAIModalOpen(true)} className="flex items-center gap-2 px-4 py-2 text-[10px] font-black text-indigo-600 hover:text-indigo-700 uppercase tracking-[0.2em] transition-colors"><Sparkles className="h-4 w-4" /> AI Lab</button>
+              {/* <button onClick={() => setIsAIModalOpen(true)} className="flex items-center gap-2 px-4 py-2 text-[10px] font-black text-indigo-600 hover:text-indigo-700 uppercase tracking-[0.2em] transition-colors"><Sparkles className="h-4 w-4" /> AI Lab</button> */}
               <button onClick={() => { setSelectedItem(undefined); setIsModalOpen(true); }} className="flex items-center gap-2 px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all active:scale-95"><Plus className="h-4 w-4" /> New Theme</button>
             </div>
           </div>
         </header>
 
         <div className="flex-1 overflow-hidden">
-          {activeView === 'portfolio' && <PortfolioView items={items} products={products} milestones={milestones} onEditItem={(item) => { setSelectedItem(item); setIsModalOpen(true); }} onEditProduct={(p) => { setSelectedProduct(p); setIsProductModalOpen(true); }} onEditMilestone={(m) => { setSelectedMilestone(m); setIsMilestoneModalOpen(true); }} onAddMilestone={(pid, m) => { setActiveContext({ productId: pid, month: m }); setSelectedMilestone(undefined); setIsMilestoneModalOpen(true); }} onMoveItem={(id, month) => { const item = items.find(i => i.id === id); if(item) handleUpdateItem({...item, startMonth: month}); }} />}
-          {activeView === 'board' && <div className="p-8 h-full overflow-auto custom-scrollbar"><RoadmapBoard items={items} teams={teams} onEditItem={(item) => { setSelectedItem(item); setIsModalOpen(true); }} onMoveItem={(id, newStatus) => { const item = items.find(i => i.id === id); if(item) handleUpdateItem({ ...item, status: newStatus }) }} /></div>}
+          {activeView === 'portfolio' && <PortfolioView items={items} products={products} milestones={milestones} onEditItem={(item) => { setSelectedItem(item); setIsModalOpen(true); }} onEditProduct={(p) => { setSelectedProduct(p); setIsProductModalOpen(true); }} onEditMilestone={(m) => { setSelectedMilestone(m); setIsMilestoneModalOpen(true); }} onAddMilestone={(pid, m) => { setActiveContext({ productId: pid, month: m }); setSelectedMilestone(undefined); setIsMilestoneModalOpen(true); }} onMoveItem={(id, month) => { const item = items.find(i => i.id === id); if (item) handleUpdateItem({ ...item, startMonth: month }); }} />}
+          {activeView === 'board' && <div className="p-8 h-full overflow-auto custom-scrollbar"><RoadmapBoard items={items} teams={teams} onEditItem={(item) => { setSelectedItem(item); setIsModalOpen(true); }} onMoveItem={(id, newStatus) => { const item = items.find(i => i.id === id); if (item) handleUpdateItem({ ...item, status: newStatus }) }} /></div>}
           {activeView === 'timeline' && <div className="p-8 h-full overflow-auto custom-scrollbar"><TimelineView items={items} onEditItem={(item) => { setSelectedItem(item); setIsModalOpen(true); }} /></div>}
           {activeView === 'analytics' && <div className="p-8 h-full overflow-auto custom-scrollbar"><AnalyticsView items={items} /></div>}
-          {activeView === 'integrations' && <IntegrationsView integrations={[]} onToggle={() => {}} />}
+          {activeView === 'integrations' && <IntegrationsView integrations={[]} onToggle={() => { }} />}
         </div>
       </main>
 
