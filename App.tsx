@@ -58,25 +58,37 @@ const App: React.FC = () => {
 
     setSyncStatus('syncing');
     try {
-      const [pRes, iRes, mRes, tRes] = await Promise.all([
+      const supabase = getSupabaseClient();
+      if (!supabase) throw new Error('Supabase client missing');
+
+      // Fetch each table individually to handle missing tables (like 'teams') gracefully
+      const [pRes, iRes, mRes] = await Promise.all([
         supabase.from('products').select('*').order('name'),
         supabase.from('roadmap_items').select('*'),
-        supabase.from('milestones').select('*'),
-        supabase.from('teams').select('*').order('name')
+        supabase.from('milestones').select('*')
       ]);
+
+      // Teams/Verticals is optional/new, so we handle its error specifically
+      const tRes = await supabase.from('teams').select('*').order('name');
 
       if (pRes.error) console.error("Products error:", pRes.error);
       if (iRes.error) console.error("Items error:", iRes.error);
       if (mRes.error) console.error("Milestones error:", mRes.error);
-      if (tRes.error) console.error("Teams error:", tRes.error);
 
-      if (pRes.error || iRes.error || mRes.error || tRes.error) throw new Error('Cloud sync failed');
+      if (pRes.error || iRes.error || mRes.error) {
+        throw new Error('Core cloud sync failed');
+      }
 
-      const cloudVerticals = (tRes.data || []).map((t: any) => ({
-        id: t.id,
-        name: t.name,
-        color: t.color || 'bg-slate-500'
-      }));
+      let cloudVerticals = verticals; // Fallback to current local state if table missing
+      if (tRes.error) {
+        console.warn("Teams table missing or inaccessible. Fallback to local storage.", tRes.error);
+      } else {
+        cloudVerticals = (tRes.data || []).map((t: any) => ({
+          id: t.id,
+          name: t.name,
+          color: t.color || 'bg-slate-500'
+        }));
+      }
 
       const cloudProducts = pRes.data || [];
       const cloudItems = (iRes.data || []).map((item: any) => ({
