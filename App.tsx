@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Search, Plus, Layers, CloudCheck, RefreshCw, Database, AlertTriangle, Languages, Briefcase } from 'lucide-react';
+import { Search, Plus, Layers, Cloud, RefreshCw, Database, AlertTriangle, Languages, Briefcase } from 'lucide-react';
 import { getSupabaseClient, isSupabaseReady } from './lib/supabase';
 import { localDB } from './lib/persistence';
 import Sidebar from './components/Sidebar';
@@ -58,7 +58,6 @@ const App: React.FC = () => {
 
     setSyncStatus('syncing');
     try {
-      const supabase = getSupabaseClient();
       if (!supabase) throw new Error('Supabase client missing');
 
       // Fetch each table individually to handle missing tables (like 'teams') gracefully
@@ -355,7 +354,7 @@ const App: React.FC = () => {
               {syncStatus === 'syncing' ? (
                 <RefreshCw className="h-3.5 w-3.5 animate-spin" />
               ) : syncStatus === 'synced' ? (
-                <CloudCheck className="h-3.5 w-3.5" />
+                <Cloud className="h-3.5 w-3.5" />
               ) : syncStatus === 'offline' ? (
                 <Database className="h-3.5 w-3.5" />
               ) : (
