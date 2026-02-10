@@ -76,9 +76,14 @@ const App: React.FC = () => {
         ...item,
         productId: item.product_id,
         teamId: item.team_id,
+        startMonth: item.start_month,
+        spanMonths: item.span_months,
         subFeatures: item.sub_features || []
       }));
-      const cloudMilestones = mRes.data || [];
+      const cloudMilestones = (mRes.data || []).map((m: any) => ({
+        ...m,
+        productId: m.product_id
+      }));
 
       setProducts(cloudProducts);
       setItems(cloudItems);
@@ -113,7 +118,7 @@ const App: React.FC = () => {
     const supabase = getSupabaseClient();
     if (supabase) {
       setSyncStatus('syncing');
-      await supabase.from('roadmap_items').upsert({
+      const { error } = await supabase.from('roadmap_items').upsert({
         id: updatedItem.id,
         product_id: updatedItem.productId,
         team_id: updatedItem.teamId,
@@ -129,7 +134,13 @@ const App: React.FC = () => {
         sub_features: updatedItem.subFeatures,
         quarter: getQuarterFromMonth(updatedItem.startMonth)
       });
-      setSyncStatus('synced');
+
+      if (error) {
+        console.error("Error upserting item:", error);
+        setSyncStatus('error');
+      } else {
+        setSyncStatus('synced');
+      }
     }
     await persistChanges(nextItems, products, milestones);
   };
@@ -170,8 +181,13 @@ const App: React.FC = () => {
     const supabase = getSupabaseClient();
     if (supabase) {
       setSyncStatus('syncing');
-      await supabase.from('products').upsert(product);
-      setSyncStatus('synced');
+      const { error } = await supabase.from('products').upsert(product);
+      if (error) {
+        console.error("Error upserting product:", error);
+        setSyncStatus('error');
+      } else {
+        setSyncStatus('synced');
+      }
     }
     await persistChanges(items, nextProducts, milestones);
   };
@@ -187,8 +203,19 @@ const App: React.FC = () => {
     const supabase = getSupabaseClient();
     if (supabase) {
       setSyncStatus('syncing');
-      await supabase.from('milestones').upsert(milestone);
-      setSyncStatus('synced');
+      const { error } = await supabase.from('milestones').upsert({
+        id: milestone.id,
+        product_id: milestone.productId,
+        title: milestone.title,
+        month: milestone.month,
+        description: milestone.description
+      });
+      if (error) {
+        console.error("Error upserting milestone:", error);
+        setSyncStatus('error');
+      } else {
+        setSyncStatus('synced');
+      }
     }
     await persistChanges(items, products, nextMilestones);
   };
