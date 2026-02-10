@@ -10,7 +10,6 @@ import AnalyticsView from './components/AnalyticsView';
 import ItemModal from './components/ItemModal';
 import ProductModal from './components/ProductModal';
 import MilestoneModal from './components/MilestoneModal';
-import ProgressCard from './components/ProgressCard';
 import { RoadmapItem, RoadmapStatus, Priority, ViewType, Vertical, Product, Milestone } from './types';
 import { useTranslation } from './hooks/useTranslation';
 
