@@ -163,10 +163,34 @@ const App: React.FC = () => {
     const supabase = getSupabaseClient();
     if (supabase) {
       setSyncStatus('syncing');
-      await supabase.from('roadmap_items').delete().eq('id', id);
-      setSyncStatus('synced');
+      const { error } = await supabase.from('roadmap_items').delete().eq('id', id);
+      if (error) {
+        console.error("Error deleting item:", error);
+        setSyncStatus('error');
+      } else {
+        setSyncStatus('synced');
+      }
     }
     await persistChanges(nextItems, products, milestones);
+  };
+
+  const handleDeleteProduct = async (id: string) => {
+    const nextProducts = products.filter(p => p.id !== id);
+    setProducts(nextProducts);
+    setIsProductModalOpen(false);
+
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      setSyncStatus('syncing');
+      const { error } = await supabase.from('products').delete().eq('id', id);
+      if (error) {
+        console.error("Error deleting product:", error);
+        setSyncStatus('error');
+      } else {
+        setSyncStatus('synced');
+      }
+    }
+    await persistChanges(items, nextProducts, milestones);
   };
 
   const handleSaveProduct = async (product: Product) => {
@@ -310,8 +334,20 @@ const App: React.FC = () => {
       </main>
 
       {isModalOpen && <ItemModal isOpen={isModalOpen} teams={teams} products={products} milestones={milestones} allItems={items} onClose={() => { setIsModalOpen(false); setSelectedItem(undefined); }} onSave={selectedItem ? handleUpdateItem : handleAddItem} onDelete={selectedItem ? () => handleDeleteItem(selectedItem.id) : undefined} item={selectedItem} />}
-      {isProductModalOpen && <ProductModal isOpen={isProductModalOpen} onClose={() => { setIsProductModalOpen(false); setSelectedProduct(undefined); }} onSave={handleSaveProduct} onDelete={selectedProduct ? () => { const next = products.filter(p => p.id !== selectedProduct.id); setProducts(next); persistChanges(items, next, milestones); setIsProductModalOpen(false); } : undefined} product={selectedProduct} />}
-      {isMilestoneModalOpen && <MilestoneModal isOpen={isMilestoneModalOpen} onClose={() => { setIsMilestoneModalOpen(false); setSelectedMilestone(undefined); }} onSave={handleSaveMilestone} milestone={selectedMilestone} productId={activeContext.productId} month={activeContext.month || 0} />}
+      {isProductModalOpen && <ProductModal isOpen={isProductModalOpen} onClose={() => { setIsProductModalOpen(false); setSelectedProduct(undefined); }} onSave={handleSaveProduct} onDelete={selectedProduct ? () => handleDeleteProduct(selectedProduct.id) : undefined} product={selectedProduct} />}
+      {isMilestoneModalOpen && <MilestoneModal isOpen={isMilestoneModalOpen} onClose={() => { setIsMilestoneModalOpen(false); setSelectedMilestone(undefined); }} onSave={handleSaveMilestone} onDelete={selectedMilestone ? async () => {
+        const next = milestones.filter(m => m.id !== selectedMilestone.id);
+        setMilestones(next);
+        setIsMilestoneModalOpen(false);
+        const supabase = getSupabaseClient();
+        if (supabase) {
+          setSyncStatus('syncing');
+          const { error } = await supabase.from('milestones').delete().eq('id', selectedMilestone.id);
+          if (error) { console.error("Error deleting milestone:", error); setSyncStatus('error'); }
+          else setSyncStatus('synced');
+        }
+        await persistChanges(items, products, next);
+      } : undefined} milestone={selectedMilestone} productId={activeContext.productId} month={activeContext.month || 0} />}
     </div>
   );
 };
