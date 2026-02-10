@@ -21,10 +21,7 @@ const App: React.FC = () => {
   const [items, setItems] = useState<RoadmapItem[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
-  const [verticals, setVerticals] = useState<Vertical[]>([
-    { id: 'v1', name: 'Plataforma Core', color: 'bg-indigo-500' },
-    { id: 'v2', name: 'Expansão Global', color: 'bg-violet-500' },
-  ]);
+  const [verticals, setVerticals] = useState<Vertical[]>([]);
   const [activeVerticalId, setActiveVerticalId] = useState<string>('all');
   const [syncStatus, setSyncStatus] = useState<'synced' | 'syncing' | 'error' | 'offline'>('offline');
 
@@ -61,13 +58,20 @@ const App: React.FC = () => {
 
     setSyncStatus('syncing');
     try {
-      const [pRes, iRes, mRes] = await Promise.all([
+      const [pRes, iRes, mRes, tRes] = await Promise.all([
         supabase.from('products').select('*').order('name'),
         supabase.from('roadmap_items').select('*'),
-        supabase.from('milestones').select('*')
+        supabase.from('milestones').select('*'),
+        supabase.from('teams').select('*').order('name')
       ]);
 
-      if (pRes.error || iRes.error || mRes.error) throw new Error('Cloud sync failed');
+      if (pRes.error || iRes.error || mRes.error || tRes.error) throw new Error('Cloud sync failed');
+
+      const cloudVerticals = (tRes.data || []).map((t: any) => ({
+        id: t.id,
+        name: t.name,
+        color: t.color || 'bg-slate-500'
+      }));
 
       const cloudProducts = pRes.data || [];
       const cloudItems = (iRes.data || []).map((item: any) => ({
@@ -86,9 +90,15 @@ const App: React.FC = () => {
       setProducts(cloudProducts);
       setItems(cloudItems);
       setMilestones(cloudMilestones);
+      setVerticals(cloudVerticals);
 
       // Sincroniza o local com a nuvem
-      await localDB.save('visionpath_data', { items: cloudItems, products: cloudProducts, milestones: cloudMilestones });
+      await localDB.save('visionpath_data', {
+        items: cloudItems,
+        products: cloudProducts,
+        milestones: cloudMilestones,
+        verticals: cloudVerticals
+      });
       setSyncStatus('synced');
     } catch (err) {
       console.error("Cloud Error:", err);
@@ -242,9 +252,62 @@ const App: React.FC = () => {
     await persistChanges(items, products, nextMilestones);
   };
 
+  const handleSaveVertical = async (vertical: Vertical) => {
+    const isNew = !verticals.some(v => v.id === vertical.id);
+    const nextVerticals = !isNew
+      ? verticals.map(v => v.id === vertical.id ? vertical : v)
+      : [...verticals, vertical];
+
+    setVerticals(nextVerticals);
+
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      setSyncStatus('syncing');
+      const { error } = await supabase.from('teams').upsert({
+        id: vertical.id,
+        name: vertical.name,
+        color: vertical.color
+      });
+      if (error) {
+        console.error("Error upserting vertical:", error);
+        setSyncStatus('error');
+      } else {
+        setSyncStatus('synced');
+      }
+    }
+    await localDB.save('visionpath_data', { items, products, milestones, verticals: nextVerticals });
+  };
+
+  const handleDeleteVertical = async (id: string) => {
+    const nextVerticals = verticals.filter(v => v.id !== id);
+    setVerticals(nextVerticals);
+    if (activeVerticalId === id) setActiveVerticalId('all');
+
+    const supabase = getSupabaseClient();
+    if (supabase) {
+      setSyncStatus('syncing');
+      const { error } = await supabase.from('teams').delete().eq('id', id);
+      if (error) {
+        console.error("Error deleting vertical:", error);
+        setSyncStatus('error');
+      } else {
+        setSyncStatus('synced');
+      }
+    }
+    await localDB.save('visionpath_data', { items, products, milestones, verticals: nextVerticals });
+  };
+
   return (
     <div className="flex h-screen bg-slate-50/30 overflow-hidden font-sans selection:bg-indigo-100 selection:text-indigo-900">
-      <Sidebar activeView={activeView} onViewChange={setActiveView} verticals={verticals} activeVerticalId={activeVerticalId} onVerticalChange={setActiveVerticalId} onUpdateVerticals={setVerticals} />
+      <Sidebar
+        activeView={activeView}
+        onViewChange={setActiveView}
+        verticals={verticals}
+        activeVerticalId={activeVerticalId}
+        onVerticalChange={setActiveVerticalId}
+        onAddVertical={handleSaveVertical}
+        onDeleteVertical={handleDeleteVertical}
+      />
 
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <header className="h-20 bg-white/70 backdrop-blur-xl border-b border-slate-200/60 flex items-center justify-between px-8 z-20 sticky top-0">

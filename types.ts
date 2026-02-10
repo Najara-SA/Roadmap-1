@@ -19,6 +19,13 @@ export interface Product {
   color: string;
 }
 
+export interface PersistenceState {
+  items: RoadmapItem[];
+  products: Product[];
+  milestones: Milestone[];
+  verticals?: Vertical[];
+}
+
 export interface Milestone {
   id: string;
   productId: string;

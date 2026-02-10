@@ -21,6 +21,11 @@ export const translations = {
     localSafe: 'Modo Local',
     connError: 'Erro de Conexão',
     syncing: 'Sincronizando...',
+    context: 'Contexto',
+    all: 'Geral',
+    manage: 'Gerenciar',
+    done: 'Concluído',
+    newVerticalTitle: 'Nova Vertical...',
 
     // Views
     backlog: 'Backlog',
@@ -86,6 +91,11 @@ export const translations = {
     localSafe: 'Modo Local',
     connError: 'Error de Conexión',
     syncing: 'Sincronizando...',
+    context: 'Contexto',
+    all: 'General',
+    manage: 'Gestionar',
+    done: 'Hecho',
+    newVerticalTitle: 'Nueva Vertical...',
 
     // Views
     backlog: 'Backlog',
@@ -151,6 +161,11 @@ export const translations = {
     localSafe: 'Local Safe',
     connError: 'Conn Error',
     syncing: 'Syncing...',
+    context: 'Context',
+    all: 'General',
+    manage: 'Manage',
+    done: 'Done',
+    newVerticalTitle: 'New Vertical...',
 
     // Views
     backlog: 'Backlog',

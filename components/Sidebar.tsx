@@ -14,7 +14,8 @@ import {
   Plus,
   Settings2,
   Check,
-  MoreVertical
+  MoreVertical,
+  Trash2
 } from 'lucide-react';
 import { ViewType, Vertical } from '../types';
 import { useTranslation } from '../hooks/useTranslation';
@@ -25,7 +26,8 @@ interface SidebarProps {
   verticals: Vertical[];
   activeVerticalId: string;
   onVerticalChange: (id: string) => void;
-  onUpdateVerticals: (verticals: Vertical[]) => void;
+  onAddVertical: (vertical: Vertical) => void;
+  onDeleteVertical: (id: string) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -34,7 +36,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   verticals,
   activeVerticalId,
   onVerticalChange,
-  onUpdateVerticals
+  onAddVertical,
+  onDeleteVertical
 }) => {
   const { t } = useTranslation();
   const [isEditingVerticals, setIsEditingVerticals] = React.useState(false);
@@ -51,15 +54,14 @@ const Sidebar: React.FC<SidebarProps> = ({
     const newV: Vertical = {
       id: Math.random().toString(36).substring(2, 9),
       name: newVerticalName,
-      color: 'bg-slate-500' // Default
+      color: 'bg-indigo-500' // Default color
     };
-    onUpdateVerticals([...verticals, newV]);
+    onAddVertical(newV);
     setNewVerticalName('');
   };
 
   const handleRemoveVertical = (id: string) => {
-    onUpdateVerticals(verticals.filter(v => v.id !== id));
-    if (activeVerticalId === id) onVerticalChange('all');
+    onDeleteVertical(id);
   };
 
   return (
@@ -76,13 +78,13 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         <div className="mb-10">
-          <div className="flex items-center justify-between mb-3 ml-1">
-            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Context</label>
+          <div className="flex items-center justify-between mb-4 ml-1">
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] leading-none font-display">{t('context')}</label>
             <button
               onClick={() => setIsEditingVerticals(!isEditingVerticals)}
-              className="text-[10px] font-bold text-indigo-500 hover:text-indigo-600 transition-colors uppercase tracking-widest"
+              className="text-[10px] font-black text-indigo-500 hover:text-indigo-600 transition-all uppercase tracking-widest bg-indigo-50 px-2 py-1 rounded-lg"
             >
-              {isEditingVerticals ? 'Done' : 'Manage'}
+              {isEditingVerticals ? t('done') : t('manage')}
             </button>
           </div>
 
@@ -91,61 +93,58 @@ const Sidebar: React.FC<SidebarProps> = ({
               <select
                 value={activeVerticalId}
                 onChange={(e) => onVerticalChange(e.target.value)}
-                className="w-full pl-10 pr-8 py-3 text-xs font-bold text-slate-700 bg-slate-50/50 border border-slate-200 rounded-2xl appearance-none focus:outline-none focus:ring-4 focus:ring-indigo-500/10 cursor-pointer transition-all hover:bg-white"
+                className="w-full pl-10 pr-8 py-4 text-[13px] font-bold text-slate-700 bg-slate-50 border border-slate-200/50 rounded-2xl appearance-none focus:outline-none focus:ring-4 focus:ring-indigo-500/10 cursor-pointer transition-all hover:bg-white hover:border-indigo-200/50 shadow-sm"
               >
-                <option value="all">Enterprise-wide</option>
+                <option value="all">{t('all')}</option>
                 {verticals.map(v => (
                   <option key={v.id} value={v.id}>{v.name}</option>
                 ))}
               </select>
-              <Users className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
-              <ChevronDown className="absolute right-3.5 top-4 h-3 w-3 text-slate-400 pointer-events-none group-hover:translate-y-0.5 transition-transform" />
+              <Users className="absolute left-3.5 top-4 h-4 w-4 text-slate-400" />
+              <ChevronDown className="absolute right-3.5 top-5 h-3 w-3 text-slate-400 pointer-events-none group-hover:translate-y-0.5 transition-transform" />
             </div>
           ) : (
-            <div className="space-y-2 animate-in fade-in duration-300">
+            <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
               {verticals.map(v => (
-                <div key={v.id} className="flex items-center gap-2 px-3 py-2 bg-slate-50 border border-slate-100 rounded-xl group">
-                  <span className="flex-1 text-[11px] font-bold text-slate-700 truncate">{v.name}</span>
-                  <button onClick={() => handleRemoveVertical(v.id)} className="opacity-0 group-hover:opacity-100 p-1 hover:bg-rose-50 text-slate-300 hover:text-rose-500 rounded-lg transition-all">
-                    <MoreVertical className="h-3 w-3" />
+                <div key={v.id} className="flex items-center gap-2 pr-2 pl-3 py-2 bg-slate-50/50 border border-slate-200/40 rounded-xl group hover:border-rose-100 transition-all">
+                  <span className="flex-1 text-[12px] font-bold text-slate-700 truncate">{v.name}</span>
+                  <button onClick={() => handleRemoveVertical(v.id)} className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-rose-50 text-slate-300 hover:text-rose-500 rounded-lg transition-all active:scale-90">
+                    <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 </div>
               ))}
-              <div className="flex gap-2 pt-1">
+              <div className="flex gap-2 pt-2">
                 <input
                   type="text"
-                  placeholder="New vertical..."
-                  className="flex-1 px-3 py-2 text-[11px] font-bold border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                  placeholder={t('newVerticalTitle')}
+                  className="flex-1 px-4 py-2.5 text-[12px] font-medium border border-slate-200 rounded-xl outline-none focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-200 transition-all"
                   value={newVerticalName}
                   onChange={(e) => setNewVerticalName(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAddVertical()}
                 />
                 <button
                   onClick={handleAddVertical}
-                  className="p-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
+                  className="p-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 active:scale-95"
                 >
-                  <Plus className="h-3.5 w-3.5" />
+                  <Plus className="h-4 w-4" />
                 </button>
               </div>
             </div>
           )}
         </div>
 
-        <nav className="space-y-2">
+        <nav className="space-y-1.5">
           {navItems.map((item) => (
             <button
               key={item.id}
               onClick={() => onViewChange(item.id)}
-              className={`w-full flex items-center gap-3.5 px-4 py-3 text-sm font-bold rounded-2xl transition-all relative overflow-hidden group ${activeView === item.id
-                ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-100 translate-x-1'
-                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+              className={`w-full flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all group ${activeView === item.id
+                ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-200'
+                : 'text-slate-500 hover:bg-slate-50 hover:text-indigo-600'
                 }`}
             >
-              <item.icon className={`h-4.5 w-4.5 transition-colors ${activeView === item.id ? 'text-white' : 'text-slate-400 group-hover:text-slate-600'}`} />
-              <span className="relative z-10">{item.label}</span>
-              {activeView === item.id && (
-                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] duration-1000 transition-transform"></div>
-              )}
+              <item.icon className={`h-5 w-5 ${activeView === item.id ? 'text-white' : 'text-slate-400 group-hover:text-indigo-600'} transition-colors`} />
+              <span className="text-[13px] font-bold tracking-tight">{item.label}</span>
             </button>
           ))}
         </nav>
