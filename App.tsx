@@ -42,6 +42,7 @@ const App: React.FC = () => {
         setItems(cached.items || []);
         setProducts(cached.products || []);
         setMilestones(cached.milestones || []);
+        setVerticals(cached.verticals || []);
       }
     } catch (e) {
       console.error("Falha ao carregar banco local", e);
@@ -129,9 +130,14 @@ const App: React.FC = () => {
     loadLocalData().then(() => syncWithCloud());
   }, [loadLocalData, syncWithCloud]);
 
-  const persistChanges = async (newItems: RoadmapItem[], newProducts: Product[], newMilestones: Milestone[]) => {
+  const persistChanges = async (newItems: RoadmapItem[], newProducts: Product[], newMilestones: Milestone[], newVerticals: Vertical[]) => {
     // Mantém local atualizado
-    await localDB.save('visionpath_data', { items: newItems, products: newProducts, milestones: newMilestones });
+    await localDB.save('visionpath_data', {
+      items: newItems,
+      products: newProducts,
+      milestones: newMilestones,
+      verticals: newVerticals
+    });
   };
 
   const handleUpdateItem = async (updatedItem: RoadmapItem) => {
@@ -169,7 +175,7 @@ const App: React.FC = () => {
         setSyncStatus('synced');
       }
     }
-    await persistChanges(nextItems, products, milestones);
+    await persistChanges(nextItems, products, milestones, verticals);
   };
 
   const handleAddItem = async (item: any) => {
@@ -198,7 +204,7 @@ const App: React.FC = () => {
         setSyncStatus('synced');
       }
     }
-    await persistChanges(nextItems, products, milestones);
+    await persistChanges(nextItems, products, milestones, verticals);
   };
 
   const handleDeleteProduct = async (id: string) => {
@@ -217,7 +223,7 @@ const App: React.FC = () => {
         setSyncStatus('synced');
       }
     }
-    await persistChanges(items, nextProducts, milestones);
+    await persistChanges(items, nextProducts, milestones, verticals);
   };
 
   const handleSaveProduct = async (product: Product) => {
@@ -246,7 +252,7 @@ const App: React.FC = () => {
         setSyncStatus('synced');
       }
     }
-    await persistChanges(items, nextProducts, milestones);
+    await persistChanges(items, nextProducts, milestones, verticals);
   };
 
   const handleSaveMilestone = async (milestone: Milestone) => {
@@ -274,7 +280,7 @@ const App: React.FC = () => {
         setSyncStatus('synced');
       }
     }
-    await persistChanges(items, products, nextMilestones);
+    await persistChanges(items, products, nextMilestones, verticals);
   };
 
   const handleSaveVertical = async (vertical: Vertical) => {
@@ -300,7 +306,7 @@ const App: React.FC = () => {
         setSyncStatus('synced');
       }
     }
-    await localDB.save('visionpath_data', { items, products, milestones, verticals: nextVerticals });
+    await persistChanges(items, products, milestones, nextVerticals);
   };
 
   const handleDeleteVertical = async (id: string) => {
@@ -319,7 +325,7 @@ const App: React.FC = () => {
         setSyncStatus('synced');
       }
     }
-    await localDB.save('visionpath_data', { items, products, milestones, verticals: nextVerticals });
+    await persistChanges(items, products, milestones, nextVerticals);
   };
 
   const filteredByFamily = activeVerticalId === 'all'
@@ -427,7 +433,19 @@ const App: React.FC = () => {
         </header>
 
         <div className="flex-1 overflow-hidden">
-          {activeView === 'portfolio' && <PortfolioView items={items} products={products} verticals={verticals} milestones={milestones} onEditItem={(item) => { setSelectedItem(item); setIsModalOpen(true); }} onEditProduct={(p) => { setSelectedProduct(p); setIsProductModalOpen(true); }} onEditMilestone={(m) => { setSelectedMilestone(m); setIsMilestoneModalOpen(true); }} onAddMilestone={(pid, m) => { setActiveContext({ productId: pid, month: m }); setSelectedMilestone(undefined); setIsMilestoneModalOpen(true); }} onMoveItem={(id, month) => { const item = items.find(i => i.id === id); if (item) handleUpdateItem({ ...item, startMonth: month }); }} />}
+          {activeView === 'portfolio' && (
+            <PortfolioView
+              items={items}
+              products={products}
+              verticals={activeVerticalId === 'all' ? verticals : verticals.filter(v => v.id === activeVerticalId)}
+              milestones={milestones}
+              onEditItem={(item) => { setSelectedItem(item); setIsModalOpen(true); }}
+              onEditProduct={(p) => { setSelectedProduct(p); setIsProductModalOpen(true); }}
+              onEditMilestone={(m) => { setSelectedMilestone(m); setIsMilestoneModalOpen(true); }}
+              onAddMilestone={(pid, m) => { setActiveContext({ productId: pid, month: m }); setSelectedMilestone(undefined); setIsMilestoneModalOpen(true); }}
+              onMoveItem={(id, month) => { const item = items.find(i => i.id === id); if (item) handleUpdateItem({ ...item, startMonth: month }); }}
+            />
+          )}
           {activeView === 'timeline' && <div className="p-8 h-full overflow-auto custom-scrollbar"><TimelineView items={items} milestones={milestones} onEditItem={(item) => { setSelectedItem(item); setIsModalOpen(true); }} /></div>}
           {activeView === 'analytics' && <div className="p-8 h-full overflow-auto custom-scrollbar"><AnalyticsView items={items} /></div>}
         </div>
@@ -446,7 +464,7 @@ const App: React.FC = () => {
           if (error) { console.error("Error deleting milestone:", error); setSyncStatus('error'); }
           else setSyncStatus('synced');
         }
-        await persistChanges(items, products, next);
+        await persistChanges(items, products, next, verticals);
       } : undefined} milestone={selectedMilestone} productId={activeContext.productId} month={activeContext.month || 0} />}
     </div>
   );

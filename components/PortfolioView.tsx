@@ -79,40 +79,15 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({
                   {/* Sub-products Rows */}
                   {familyProducts.map(product => (
                     <div key={product.id} className="flex border-b border-slate-100 group/row bg-white transition-colors hover:bg-slate-50/30">
-                      <div className="w-64 flex-shrink-0 p-8 border-r border-slate-200/60 sticky left-0 z-30 bg-white group-hover/row:bg-slate-50/50 transition-all">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className={`h-9 w-9 ${product.color} rounded-2xl shadow-sm flex items-center justify-center text-white cursor-pointer group/icon hover:scale-105 transition-transform`} onClick={() => onEditProduct(product)}>
-                            <Edit3 className="h-4 w-4 opacity-0 group-hover/row:opacity-100 transition-opacity" />
-                          </div>
-                          <h3 className="font-display font-bold text-slate-900 leading-tight text-base tracking-tight">{product.name}</h3>
-                        </div>
-                        <p className="text-[11px] text-slate-500 font-medium leading-relaxed line-clamp-2">{product.description}</p>
-                      </div>
-
+                      <RowHeader product={product} onEdit={() => onEditProduct(product)} />
                       <div className="flex-1 relative min-h-[180px]">
-                        <div className="absolute inset-0 grid grid-cols-12 pointer-events-none opacity-50">
-                          {MONTHS.map((_, i) => (
-                            <div key={i} className="border-r border-slate-100 last:border-r-0" />
-                          ))}
-                        </div>
-
+                        <GridBackground />
                         <div className="relative p-8 grid grid-cols-12 gap-y-6 auto-rows-min">
                           {items
                             .filter(item => item.productId === product.id)
-                            .map(item => {
-                              const span = Math.min(item.spanMonths || 1, 12 - item.startMonth);
-                              return (
-                                <div
-                                  key={item.id}
-                                  style={{ gridColumn: `${item.startMonth + 1} / span ${span}` }}
-                                  className="transition-all z-10"
-                                  draggable
-                                  onDragStart={() => setDraggedItemId(item.id)}
-                                >
-                                  <CleanItemCard item={item} milestones={milestones} onEdit={() => onEditItem(item)} />
-                                </div>
-                              );
-                            })}
+                            .map(item => (
+                              <ItemWrapper key={item.id} item={item} milestones={milestones} onEdit={() => onEditItem(item)} onDragStart={() => setDraggedItemId(item.id)} />
+                            ))}
                         </div>
                       </div>
                     </div>
@@ -121,8 +96,96 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({
               );
             })
           )}
+
+          {/* Seção Geral para Itens Sem Vínculo (Show only if there are unlinked items or products) */}
+          {(products.filter(p => !p.familyId).length > 0 || items.filter(i => !i.productId || !products.some(p => p.id === i.productId)).length > 0) && (
+            <div className="border-b-4 border-slate-200/40 opacity-90 hover:opacity-100 transition-opacity">
+              <div className="flex bg-slate-100/80 border-b border-slate-200/60 sticky left-0 z-20">
+                <div className="w-64 flex-shrink-0 p-4 pl-8 border-r border-slate-200/60 flex items-center gap-3">
+                  <div className="h-3 w-3 bg-slate-400 rounded-full"></div>
+                  <span className="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">{t('all') || 'Geral'} / {t('unlinked') || 'Sem Categoria'}</span>
+                </div>
+                <div className="flex-1"></div>
+              </div>
+
+              {/* Products without Family */}
+              {products.filter(p => !p.familyId).map(product => (
+                <div key={product.id} className="flex border-b border-slate-100 group/row bg-white transition-colors hover:bg-slate-50/30">
+                  <RowHeader product={product} onEdit={() => onEditProduct(product)} />
+                  <div className="flex-1 relative min-h-[180px]">
+                    <GridBackground />
+                    <div className="relative p-8 grid grid-cols-12 gap-y-6 auto-rows-min">
+                      {items.filter(item => item.productId === product.id).map(item => (
+                        <ItemWrapper key={item.id} item={item} milestones={milestones} onEdit={() => onEditItem(item)} onDragStart={() => setDraggedItemId(item.id)} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Items without Product */}
+              {items.filter(i => !i.productId || !products.some(p => p.id === i.productId)).length > 0 && (
+                <div className="flex border-b border-slate-100 group/row bg-slate-50/30">
+                  <div className="w-64 flex-shrink-0 p-8 border-r border-slate-200/60 sticky left-0 z-30 bg-slate-50/50">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="h-9 w-9 bg-slate-400 rounded-2xl flex items-center justify-center text-white">
+                        <Timer className="h-4 w-4" />
+                      </div>
+                      <h3 className="font-display font-bold text-slate-600 leading-tight text-base tracking-tight">{t('standaloneThemes') || 'Temas Avulsos'}</h3>
+                    </div>
+                    <p className="text-[11px] text-slate-400 font-medium leading-relaxed">{t('standaloneDesc') || 'Itens não associados a um módulo específico.'}</p>
+                  </div>
+                  <div className="flex-1 relative min-h-[180px]">
+                    <GridBackground />
+                    <div className="relative p-8 grid grid-cols-12 gap-y-6 auto-rows-min">
+                      {items
+                        .filter(i => !i.productId || !products.some(p => p.id === i.productId))
+                        .map(item => (
+                          <ItemWrapper key={item.id} item={item} milestones={milestones} onEdit={() => onEditItem(item)} onDragStart={() => setDraggedItemId(item.id)} />
+                        ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
+    </div>
+  );
+};
+
+// Sub-components to keep cleaning
+const GridBackground = () => (
+  <div className="absolute inset-0 grid grid-cols-12 pointer-events-none opacity-50">
+    {Array.from({ length: 12 }).map((_, i) => (
+      <div key={i} className="border-r border-slate-100 last:border-r-0" />
+    ))}
+  </div>
+);
+
+const RowHeader: React.FC<{ product: Product, onEdit: () => void }> = ({ product, onEdit }) => (
+  <div className="w-64 flex-shrink-0 p-8 border-r border-slate-200/60 sticky left-0 z-30 bg-white group-hover/row:bg-slate-50/50 transition-all">
+    <div className="flex items-center gap-3 mb-4">
+      <div className={`h-9 w-9 ${product.color} rounded-2xl shadow-sm flex items-center justify-center text-white cursor-pointer group/icon hover:scale-105 transition-transform`} onClick={onEdit}>
+        <Edit3 className="h-4 w-4 opacity-0 group-hover/row:opacity-100 transition-opacity" />
+      </div>
+      <h3 className="font-display font-bold text-slate-900 leading-tight text-base tracking-tight">{product.name}</h3>
+    </div>
+    <p className="text-[11px] text-slate-500 font-medium leading-relaxed line-clamp-2">{product.description}</p>
+  </div>
+);
+
+const ItemWrapper: React.FC<{ item: RoadmapItem, milestones: Milestone[], onEdit: () => void, onDragStart: () => void }> = ({ item, milestones, onEdit, onDragStart }) => {
+  const span = Math.min(item.spanMonths || 1, 12 - item.startMonth);
+  return (
+    <div
+      style={{ gridColumn: `${item.startMonth + 1} / span ${span}` }}
+      className="transition-all z-10"
+      draggable
+      onDragStart={onDragStart}
+    >
+      <CleanItemCard item={item} milestones={milestones} onEdit={onEdit} />
     </div>
   );
 };
@@ -146,9 +209,9 @@ const CleanItemCard: React.FC<{ item: RoadmapItem; milestones: Milestone[]; onEd
         </div>
 
         {item.milestoneId && (
-          <div className="flex items-center gap-1.5 mb-3">
-            <div className="h-1.5 w-1.5 rounded-full bg-indigo-500"></div>
-            <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest truncate">
+          <div className="flex items-center gap-2 mb-3 bg-indigo-50/50 px-2 py-1 rounded-lg border border-indigo-100/30">
+            <div className="h-1.5 w-1.5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]"></div>
+            <span className="text-[9px] font-black text-indigo-600 uppercase tracking-widest truncate">
               {milestones.find(m => m.id === item.milestoneId)?.title || 'Milestone'}
             </span>
           </div>

@@ -26,6 +26,9 @@ export const translations = {
     manage: 'Gerenciar',
     done: 'Concluído',
     newVerticalTitle: 'Nova Vertical...',
+    unlinked: 'Sem Categoria',
+    standaloneThemes: 'Temas Avulsos',
+    standaloneDesc: 'Itens não associados a um módulo específico.',
 
     // Views
     backlog: 'Backlog',
@@ -105,6 +108,9 @@ export const translations = {
     manage: 'Gestionar',
     done: 'Hecho',
     newVerticalTitle: 'Nueva Vertical...',
+    unlinked: 'Sin Categoría',
+    standaloneThemes: 'Temas Independientes',
+    standaloneDesc: 'Artículos no asociados a un módulo específico.',
 
     // Views
     backlog: 'Backlog',
@@ -184,6 +190,9 @@ export const translations = {
     manage: 'Manage',
     done: 'Done',
     newVerticalTitle: 'New Vertical...',
+    unlinked: 'Uncategorized',
+    standaloneThemes: 'Standalone Themes',
+    standaloneDesc: 'Items not associated with a specific module.',
 
     // Views
     backlog: 'Backlog',
