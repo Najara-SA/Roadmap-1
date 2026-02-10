@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RoadmapItem, RoadmapStatus } from '../types';
+import { RoadmapItem, RoadmapStatus, Milestone, Product } from '../types';
 import {
   Calendar,
   ChevronRight,
@@ -16,10 +16,11 @@ import { useTranslation } from '../hooks/useTranslation';
 
 interface TimelineViewProps {
   items: RoadmapItem[];
+  milestones: Milestone[];
   onEditItem: (item: RoadmapItem) => void;
 }
 
-const TimelineView: React.FC<TimelineViewProps> = ({ items, onEditItem }) => {
+const TimelineView: React.FC<TimelineViewProps> = ({ items, milestones, onEditItem }) => {
   const { t } = useTranslation();
   const sortedItems = [...items].sort((a, b) => a.quarter.localeCompare(b.quarter));
 
@@ -54,7 +55,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({ items, onEditItem }) => {
 
                 <div className="space-y-8">
                   {quarterItems.map(item => (
-                    <TimelineItemCard key={item.id} item={item} onEdit={() => onEditItem(item)} />
+                    <TimelineItemCard key={item.id} item={item} milestones={milestones} onEdit={() => onEditItem(item)} />
                   ))}
                 </div>
               </div>
@@ -66,7 +67,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({ items, onEditItem }) => {
   );
 };
 
-const TimelineItemCard: React.FC<{ item: RoadmapItem; onEdit: () => void }> = ({ item, onEdit }) => {
+const TimelineItemCard: React.FC<{ item: RoadmapItem; milestones: Milestone[]; onEdit: () => void }> = ({ item, milestones, onEdit }) => {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -85,8 +86,16 @@ const TimelineItemCard: React.FC<{ item: RoadmapItem; onEdit: () => void }> = ({
             <div>
               <div className="flex items-center gap-4 mb-2">
                 <h4 className="text-2xl font-display font-black text-slate-900 group-hover/card:text-indigo-600 transition-colors leading-tight tracking-tight">{item.title}</h4>
+                {item.milestoneId && (
+                  <div className="flex items-center gap-2 px-3 py-1 bg-indigo-50/50 rounded-xl border border-indigo-100/50">
+                    <div className="h-2 w-2 rounded-full bg-indigo-500"></div>
+                    <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest flex-shrink-0">
+                      {milestones.find(m => m.id === item.milestoneId)?.title || 'Milestone'}
+                    </span>
+                  </div>
+                )}
                 {totalCount > 0 && (
-                  <span className="px-4 py-1.5 bg-indigo-50 text-indigo-600 text-[11px] font-black rounded-full uppercase tracking-widest border border-indigo-100/50">
+                  <span className="px-4 py-1.5 bg-slate-50 text-slate-400 text-[11px] font-black rounded-full uppercase tracking-widest border border-slate-100">
                     {completedCount}/{totalCount}
                   </span>
                 )}

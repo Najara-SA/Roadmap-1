@@ -405,7 +405,7 @@ const App: React.FC = () => {
 
         <div className="flex-1 overflow-hidden">
           {activeView === 'portfolio' && <PortfolioView items={items} products={products} milestones={milestones} onEditItem={(item) => { setSelectedItem(item); setIsModalOpen(true); }} onEditProduct={(p) => { setSelectedProduct(p); setIsProductModalOpen(true); }} onEditMilestone={(m) => { setSelectedMilestone(m); setIsMilestoneModalOpen(true); }} onAddMilestone={(pid, m) => { setActiveContext({ productId: pid, month: m }); setSelectedMilestone(undefined); setIsMilestoneModalOpen(true); }} onMoveItem={(id, month) => { const item = items.find(i => i.id === id); if (item) handleUpdateItem({ ...item, startMonth: month }); }} />}
-          {activeView === 'timeline' && <div className="p-8 h-full overflow-auto custom-scrollbar"><TimelineView items={items} onEditItem={(item) => { setSelectedItem(item); setIsModalOpen(true); }} /></div>}
+          {activeView === 'timeline' && <div className="p-8 h-full overflow-auto custom-scrollbar"><TimelineView items={items} milestones={milestones} onEditItem={(item) => { setSelectedItem(item); setIsModalOpen(true); }} /></div>}
           {activeView === 'analytics' && <div className="p-8 h-full overflow-auto custom-scrollbar"><AnalyticsView items={items} /></div>}
         </div>
       </main>

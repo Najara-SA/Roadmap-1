@@ -209,13 +209,31 @@ const ItemModal: React.FC<ItemModalProps> = ({
                 </div>
               </div>
               <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('priority')}</label>
+                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('milestones')}</label>
                 <div className="relative">
-                  <select className="w-full px-5 py-3.5 border border-slate-200 rounded-2xl outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all" value={formData.priority} onChange={e => setFormData({ ...formData, priority: e.target.value as Priority })}>
-                    {Object.values(Priority).map(p => <option key={p} value={p}>{p === Priority.HIGH ? t('high') : p === Priority.MEDIUM ? t('medium') : t('low')}</option>)}
+                  <select
+                    className="w-full px-5 py-3.5 border border-slate-200 rounded-2xl outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all"
+                    value={formData.milestoneId}
+                    onChange={e => setFormData({ ...formData, milestoneId: e.target.value })}
+                  >
+                    <option value="">None</option>
+                    {milestones
+                      .filter(m => m.productId === formData.productId)
+                      .map(m => <option key={m.id} value={m.id}>{m.title}</option>)
+                    }
                   </select>
                   <ChevronDown className="absolute right-4 top-4 h-4 w-4 text-slate-400 pointer-events-none" />
                 </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('priority')}</label>
+              <div className="relative">
+                <select className="w-full px-5 py-3.5 border border-slate-200 rounded-2xl outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all" value={formData.priority} onChange={e => setFormData({ ...formData, priority: e.target.value as Priority })}>
+                  {Object.values(Priority).map(p => <option key={p} value={p}>{p === Priority.HIGH ? t('high') : p === Priority.MEDIUM ? t('medium') : t('low')}</option>)}
+                </select>
+                <ChevronDown className="absolute right-4 top-4 h-4 w-4 text-slate-400 pointer-events-none" />
               </div>
             </div>
 
@@ -233,8 +251,8 @@ const ItemModal: React.FC<ItemModalProps> = ({
             <button onClick={handleSubmit} className="px-10 py-3 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-2xl shadow-xl shadow-indigo-100 transition-all active:scale-95 active:shadow-none">{t('save')}</button>
           </div>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 

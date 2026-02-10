@@ -102,7 +102,7 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({
                             draggable
                             onDragStart={() => setDraggedItemId(item.id)}
                           >
-                            <CleanItemCard item={item} onEdit={() => onEditItem(item)} />
+                            <CleanItemCard item={item} milestones={milestones} onEdit={() => onEditItem(item)} />
                           </div>
                         );
                       })}
@@ -117,7 +117,7 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({
   );
 };
 
-const CleanItemCard: React.FC<{ item: RoadmapItem; onEdit: () => void }> = ({ item, onEdit }) => {
+const CleanItemCard: React.FC<{ item: RoadmapItem; milestones: Milestone[]; onEdit: () => void }> = ({ item, milestones, onEdit }) => {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const isHighPriority = item.priority === Priority.HIGH;
@@ -128,19 +128,28 @@ const CleanItemCard: React.FC<{ item: RoadmapItem; onEdit: () => void }> = ({ it
   return (
     <div className={`group/card mx-1 rounded-[1.25rem] border bg-white shadow-sm transition-all flex flex-col ${isHighPriority ? 'border-amber-200 ring-4 ring-amber-400/5 shadow-amber-100/20' : 'border-slate-100'} ${isExpanded ? 'z-40 shadow-2xl scale-[1.02] border-indigo-200' : 'hover:shadow-xl hover:border-indigo-100 hover:-translate-y-0.5'}`}>
       <div className="p-4 cursor-grab active:cursor-grabbing" onClick={onEdit}>
-        <div className="flex justify-between items-start gap-3 mb-3">
+        <div className="flex justify-between items-start gap-3 mb-2">
           <h4 className="text-[12px] font-bold text-slate-800 leading-tight tracking-tight group-hover/card:text-indigo-600 transition-colors truncate">
             {item.title}
           </h4>
           {isHighPriority && <Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400 flex-shrink-0" />}
         </div>
 
+        {item.milestoneId && (
+          <div className="flex items-center gap-1.5 mb-3">
+            <div className="h-1.5 w-1.5 rounded-full bg-indigo-500"></div>
+            <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest truncate">
+              {milestones.find(m => m.id === item.milestoneId)?.title || 'Milestone'}
+            </span>
+          </div>
+        )}
+
         {totalCount > 0 && (
-          <div className="flex items-center gap-3">
-            <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-              <div className={`h-full rounded-full transition-all duration-700 ${progressPercent === 100 ? 'bg-emerald-500' : 'bg-indigo-500'}`} style={{ width: `${progressPercent}%` }}></div>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden shadow-inner">
+              <div className={`h-full rounded-full transition-all duration-700 shadow-sm ${progressPercent === 100 ? 'bg-emerald-500' : 'bg-indigo-600'}`} style={{ width: `${progressPercent}%` }}></div>
             </div>
-            <span className="text-[10px] font-bold text-slate-400 tabular-nums">{Math.round(progressPercent)}%</span>
+            <span className="text-[9px] font-black text-slate-400 tabular-nums">{Math.round(progressPercent)}%</span>
           </div>
         )}
       </div>
