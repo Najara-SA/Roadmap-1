@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, Trash2, Flag, Calendar } from 'lucide-react';
+import { X, Trash2, Flag, Calendar, ChevronDown } from 'lucide-react';
 import { Milestone } from '../types';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface MilestoneModalProps {
   isOpen: boolean;
@@ -13,11 +14,17 @@ interface MilestoneModalProps {
   month: number;
 }
 
-const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-const MilestoneModal: React.FC<MilestoneModalProps> = ({ 
-  isOpen, onClose, onSave, onDelete, milestone, productId, month 
+const MilestoneModal: React.FC<MilestoneModalProps> = ({
+  isOpen, onClose, onSave, onDelete, milestone, productId, month
 }) => {
+  const { t, language } = useTranslation();
+
+  const MONTH_NAMES = language === 'pt'
+    ? ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
+    : language === 'es'
+      ? ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+      : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
   const [formData, setFormData] = useState<Milestone>({
     id: '',
     productId: productId,
@@ -43,41 +50,44 @@ const MilestoneModal: React.FC<MilestoneModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-gray-900/60 backdrop-blur-md p-4">
-      <div className="bg-white w-full max-w-md rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-        <div className="px-8 pt-8 pb-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-9 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600"><Flag className="h-5 w-5" /></div>
-            <h2 className="text-xl font-black text-gray-900 tracking-tight">{milestone ? 'Edit Milestone' : 'Add Milestone'}</h2>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 animate-in fade-in duration-300">
+      <div className="bg-white w-full max-w-md rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-500 ring-1 ring-slate-200/50">
+        <div className="px-10 pt-10 pb-6 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 shadow-sm shadow-amber-100/50"><Flag className="h-6 w-6" /></div>
+            <h2 className="text-2xl font-display font-black text-slate-900 tracking-tight">{milestone ? t('edit') + ' ' + t('milestones') : t('milestones')}</h2>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><X className="h-5 w-5 text-gray-400" /></button>
+          <button onClick={onClose} className="p-2.5 hover:bg-slate-50 rounded-full transition-all text-slate-400 hover:text-slate-600"><X className="h-6 w-6" /></button>
         </div>
 
-        <form onSubmit={(e) => { e.preventDefault(); onSave(formData); }} className="p-8 space-y-6">
-          <div className="space-y-4">
+        <form onSubmit={(e) => { e.preventDefault(); onSave(formData); }} className="p-10 space-y-8">
+          <div className="space-y-6">
             <div>
-              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Milestone Title</label>
-              <input required type="text" className="w-full px-5 py-3 border border-gray-200 rounded-2xl outline-none font-bold text-gray-900" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} placeholder="Key release..." />
+              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('title')}</label>
+              <input required type="text" className="w-full px-6 py-4 border border-slate-200 rounded-[1.5rem] focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 outline-none transition-all font-bold text-slate-900 text-lg shadow-sm placeholder:text-slate-300" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} placeholder="Key release..." />
             </div>
             <div>
-              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Target Month</label>
+              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('startDate')}</label>
               <div className="relative">
-                <select className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-2xl outline-none appearance-none bg-gray-50/50 font-bold text-xs" value={formData.month} onChange={e => setFormData({ ...formData, month: parseInt(e.target.value) })}>
+                <select className="w-full pl-6 pr-10 py-4 border border-slate-200 rounded-[1.5rem] outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all" value={formData.month} onChange={e => setFormData({ ...formData, month: parseInt(e.target.value) })}>
                   {MONTH_NAMES.map((m, i) => <option key={m} value={i}>{m}</option>)}
                 </select>
-                <Calendar className="absolute left-3.5 top-3.5 h-4 w-4 text-gray-400" />
+                <ChevronDown className="absolute right-4 top-5 h-4 w-4 text-slate-400 pointer-events-none" />
+                <Calendar className="absolute left-4 top-5 h-4 w-4 text-indigo-400" />
               </div>
             </div>
             <div>
-              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Context</label>
-              <textarea className="w-full px-5 py-3 border border-gray-200 rounded-2xl outline-none resize-none bg-gray-50/50 text-sm" rows={2} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
+              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('description')}</label>
+              <textarea className="w-full px-6 py-4 border border-slate-200 rounded-[1.5rem] outline-none resize-none bg-slate-50/50 text-slate-700 min-h-[80px] focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 transition-all font-medium" rows={2} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
             </div>
           </div>
 
-          <div className="pt-6 flex gap-3">
-            {milestone && onDelete && <button type="button" onClick={() => onDelete(formData.id)} className="p-2 text-red-500 mr-auto"><Trash2 className="h-5 w-5" /></button>}
-            <button type="button" onClick={onClose} className="px-6 py-2.5 text-xs font-bold text-gray-500">Cancel</button>
-            <button type="submit" className="px-8 py-2.5 text-xs font-bold text-white bg-amber-600 rounded-xl shadow-lg shadow-amber-100">Save</button>
+          <div className="pt-8 border-t border-slate-100 flex items-center justify-between">
+            {milestone && onDelete && <button type="button" onClick={() => onDelete(formData.id)} className="text-rose-500 hover:bg-rose-50 p-3 rounded-2xl transition-all group"><Trash2 className="h-6 w-6 group-hover:scale-110 transition-transform" /></button>}
+            <div className="flex gap-4 ml-auto">
+              <button type="button" onClick={onClose} className="px-8 py-3 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-2xl transition-all">{t('cancel')}</button>
+              <button type="submit" className="px-10 py-3 text-sm font-bold text-white bg-amber-600 hover:bg-amber-700 rounded-2xl shadow-xl shadow-amber-100 transition-all active:scale-95">{t('save')}</button>
+            </div>
           </div>
         </form>
       </div>

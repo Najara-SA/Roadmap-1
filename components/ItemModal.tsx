@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Trash2, Box, Flag, Clock, Calendar, ChevronDown, ChevronRight, Plus, CheckCircle2, Circle } from 'lucide-react';
 import { RoadmapItem, RoadmapStatus, Priority, Team, Product, Milestone, SubFeature } from '../types';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface ItemModalProps {
   isOpen: boolean;
@@ -15,11 +16,17 @@ interface ItemModalProps {
   allItems: RoadmapItem[];
 }
 
-const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-const ItemModal: React.FC<ItemModalProps> = ({ 
+const ItemModal: React.FC<ItemModalProps> = ({
   isOpen, onClose, onSave, onDelete, item, teams, products, milestones
 }) => {
+  const { t, language } = useTranslation();
+
+  const MONTH_NAMES = language === 'pt'
+    ? ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
+    : language === 'es'
+      ? ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+      : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -95,96 +102,126 @@ const ItemModal: React.FC<ItemModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-sm p-4">
-      <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
-        <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="text-xl font-black text-gray-900 tracking-tight">{item ? 'Feature Intelligence' : 'New Strategic Theme'}</h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><X className="h-5 w-5 text-gray-400" /></button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-md p-4 animate-in fade-in duration-300">
+      <div className="bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-500 ring-1 ring-slate-200/50">
+        <div className="px-10 py-8 border-b border-slate-100 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-indigo-50 rounded-2xl text-indigo-600">
+              <Box className="h-6 w-6" />
+            </div>
+            <h2 className="text-2xl font-display font-black text-slate-900 tracking-tight">{item ? t('editItem') : t('addItem')}</h2>
+          </div>
+          <button onClick={onClose} className="p-2.5 hover:bg-slate-50 rounded-full transition-all text-slate-400 hover:text-slate-600"><X className="h-6 w-6" /></button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-10 space-y-10 custom-scrollbar">
           {/* Main Info */}
-          <div className="space-y-5">
+          <div className="space-y-8">
             <div>
-              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Theme Title</label>
-              <input required type="text" className="w-full px-5 py-3 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-600 outline-none transition-all font-bold text-gray-900" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
+              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('title')}</label>
+              <input required type="text" className="w-full px-6 py-4 border border-slate-200 rounded-3xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 outline-none transition-all font-bold text-slate-900 text-lg placeholder:text-slate-300 shadow-sm" placeholder="Ex: Cloud Sync Infrastructure..." value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('description')}</label>
+              <textarea className="w-full px-6 py-4 border border-slate-200 rounded-3xl outline-none resize-none bg-slate-50/50 text-slate-700 min-h-[100px] focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 transition-all font-medium" rows={3} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
             </div>
 
             {/* Sub-Features Cascade Section */}
-            <div className="bg-indigo-50/30 border border-indigo-100/50 rounded-3xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <label className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Cascade Detail (Sub-features)</label>
-                <div className="text-[10px] font-bold text-indigo-400">
-                  {formData.subFeatures.filter(f => f.isCompleted).length} / {formData.subFeatures.length} Complete
+            <div className="bg-indigo-50/20 border border-indigo-100/50 rounded-[2.5rem] p-8 shadow-sm">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="h-2 w-2 rounded-full bg-indigo-500 animate-pulse"></div>
+                  <label className="text-[11px] font-black text-indigo-600 uppercase tracking-widest">{t('subFeatures')}</label>
+                </div>
+                <div className="text-[10px] font-bold text-indigo-400 bg-white px-3 py-1 rounded-full border border-indigo-100/50 shadow-sm">
+                  {formData.subFeatures.filter(f => f.isCompleted).length} / {formData.subFeatures.length} {t('completed')}
                 </div>
               </div>
-              
-              <div className="space-y-3 mb-4">
+
+              <div className="space-y-3 mb-6">
                 {formData.subFeatures.map((sf) => (
-                  <div key={sf.id} className="flex items-center gap-3 group">
-                    <button type="button" onClick={() => toggleSubFeature(sf.id)} className="transition-colors">
-                      {sf.isCompleted ? <CheckCircle2 className="h-5 w-5 text-emerald-500" /> : <Circle className="h-5 w-5 text-gray-300" />}
+                  <div key={sf.id} className="flex items-center gap-4 group p-3 rounded-2xl hover:bg-white transition-all border border-transparent hover:border-indigo-50 hover:shadow-sm">
+                    <button type="button" onClick={() => toggleSubFeature(sf.id)} className="transition-all transform hover:scale-110">
+                      {sf.isCompleted ? <CheckCircle2 className="h-6 w-6 text-emerald-500" /> : <Circle className="h-6 w-6 text-slate-200" />}
                     </button>
-                    <span className={`flex-1 text-sm font-medium ${sf.isCompleted ? 'text-gray-400 line-through' : 'text-gray-700'}`}>{sf.title}</span>
-                    <button type="button" onClick={() => removeSubFeature(sf.id)} className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-500 transition-all">
+                    <span className={`flex-1 text-sm font-bold ${sf.isCompleted ? 'text-slate-300 line-through' : 'text-slate-700'}`}>{sf.title}</span>
+                    <button type="button" onClick={() => removeSubFeature(sf.id)} className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500 transition-all p-1.5 hover:bg-rose-50 rounded-lg">
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
                 ))}
               </div>
 
-              <div className="flex gap-2">
-                <input 
-                  type="text" 
-                  className="flex-1 px-4 py-2 text-xs border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500/10 outline-none"
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  className="flex-1 px-5 py-3 text-sm border border-slate-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/5 outline-none transition-all placeholder:text-slate-300"
                   placeholder="Add detailed requirement..."
                   value={newSubFeatureTitle}
                   onChange={e => setNewSubFeatureTitle(e.target.value)}
                   onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), addSubFeature())}
                 />
-                <button type="button" onClick={addSubFeature} className="p-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors">
-                  <Plus className="h-4 w-4" />
+                <button type="button" onClick={addSubFeature} className="p-3 bg-indigo-600 text-white rounded-2xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 active:scale-95">
+                  <Plus className="h-5 w-5" />
                 </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-6">
               <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Product</label>
-                <select className="w-full px-4 py-3 border border-gray-200 rounded-2xl outline-none appearance-none bg-gray-50/50 font-bold text-xs" value={formData.productId} onChange={e => setFormData({ ...formData, productId: e.target.value, milestoneId: '' })}>
-                  {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </select>
+                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('product')}</label>
+                <div className="relative">
+                  <select className="w-full px-5 py-3.5 border border-slate-200 rounded-2xl outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all" value={formData.productId} onChange={e => setFormData({ ...formData, productId: e.target.value, milestoneId: '' })}>
+                    {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
+                  <ChevronDown className="absolute right-4 top-4 h-4 w-4 text-slate-400 pointer-events-none" />
+                </div>
               </div>
               <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Start Month</label>
-                <select className="w-full px-4 py-3 border border-gray-200 rounded-2xl outline-none bg-gray-50/50 font-bold text-xs" value={formData.startMonth} onChange={e => setFormData({ ...formData, startMonth: parseInt(e.target.value) })}>
-                  {MONTH_NAMES.map((m, i) => <option key={m} value={i}>{m}</option>)}
-                </select>
+                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('startDate')}</label>
+                <div className="relative">
+                  <select className="w-full px-5 py-3.5 border border-slate-200 rounded-2xl outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all" value={formData.startMonth} onChange={e => setFormData({ ...formData, startMonth: parseInt(e.target.value) })}>
+                    {MONTH_NAMES.map((m, i) => <option key={m} value={i}>{m}</option>)}
+                  </select>
+                  <ChevronDown className="absolute right-4 top-4 h-4 w-4 text-slate-400 pointer-events-none" />
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-               <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Duration (Months)</label>
-                <select className="w-full px-4 py-3 border border-gray-200 rounded-2xl outline-none bg-gray-50/50 font-bold text-xs" value={formData.spanMonths} onChange={e => setFormData({ ...formData, spanMonths: parseInt(e.target.value) })}>
-                  {[1,2,3,4,5,6].map(v => <option key={v} value={v}>{v} {v === 1 ? 'Month' : 'Months'}</option>)}
-                </select>
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('duration')}</label>
+                <div className="relative">
+                  <select className="w-full px-5 py-3.5 border border-slate-200 rounded-2xl outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all" value={formData.spanMonths} onChange={e => setFormData({ ...formData, spanMonths: parseInt(e.target.value) })}>
+                    {[1, 2, 3, 4, 5, 6].map(v => <option key={v} value={v}>{v} {v === 1 ? 'Month' : 'Months'}</option>)}
+                  </select>
+                  <ChevronDown className="absolute right-4 top-4 h-4 w-4 text-slate-400 pointer-events-none" />
+                </div>
               </div>
               <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Strategic Priority</label>
-                <select className="w-full px-4 py-3 border border-gray-200 rounded-2xl outline-none bg-gray-50/50 font-bold text-xs" value={formData.priority} onChange={e => setFormData({ ...formData, priority: e.target.value as Priority })}>
-                  {Object.values(Priority).map(p => <option key={p} value={p}>{p}</option>)}
-                </select>
+                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('priority')}</label>
+                <div className="relative">
+                  <select className="w-full px-5 py-3.5 border border-slate-200 rounded-2xl outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all" value={formData.priority} onChange={e => setFormData({ ...formData, priority: e.target.value as Priority })}>
+                    {Object.values(Priority).map(p => <option key={p} value={p}>{p === Priority.HIGH ? t('high') : p === Priority.MEDIUM ? t('medium') : t('low')}</option>)}
+                  </select>
+                  <ChevronDown className="absolute right-4 top-4 h-4 w-4 text-slate-400 pointer-events-none" />
+                </div>
               </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('tags')}</label>
+              <input type="text" className="w-full px-6 py-4 border border-slate-200 rounded-3xl outline-none bg-slate-50/50 text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 transition-all font-bold placeholder:text-slate-300" placeholder="cloud, infra, analytics, backend..." value={formData.tagsString} onChange={e => setFormData({ ...formData, tagsString: e.target.value })} />
             </div>
           </div>
         </form>
 
-        <div className="px-8 py-6 border-t border-gray-100 flex items-center justify-between">
-          {item && onDelete ? <button type="button" onClick={onDelete} className="text-xs font-bold text-red-500 px-4 py-2 hover:bg-red-50 rounded-xl transition-all"><Trash2 className="h-4 w-4 inline mr-2" />Remove Item</button> : <div />}
+        <div className="px-10 py-8 border-t border-slate-100 bg-slate-50/30 flex items-center justify-between">
+          {item && onDelete ? <button type="button" onClick={onDelete} className="text-sm font-bold text-rose-500 px-5 py-2.5 hover:bg-rose-50 rounded-2xl transition-all group items-center flex gap-2"><Trash2 className="h-4 w-4 group-hover:scale-110 transition-transform" />{t('delete')}</button> : <div />}
           <div className="flex gap-4">
-            <button type="button" onClick={onClose} className="px-6 py-2.5 text-xs font-bold text-gray-500 hover:bg-gray-50 rounded-xl">Cancel</button>
-            <button onClick={handleSubmit} className="px-8 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-xl shadow-indigo-100 transition-all active:scale-95">{item ? 'Update Strategy' : 'Finalize Theme'}</button>
+            <button type="button" onClick={onClose} className="px-8 py-3 text-sm font-bold text-slate-500 hover:bg-slate-200/50 rounded-2xl transition-all">{t('cancel')}</button>
+            <button onClick={handleSubmit} className="px-10 py-3 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-2xl shadow-xl shadow-indigo-100 transition-all active:scale-95 active:shadow-none">{t('save')}</button>
           </div>
         </div>
       </div>

@@ -66,11 +66,4 @@ export interface RoadmapItem {
   quarter: string;
 }
 
-export type ViewType = 'board' | 'timeline' | 'portfolio' | 'analytics' | 'integrations';
-
-export interface Integration {
-  id: 'jira' | 'trello';
-  name: string;
-  isConnected: boolean;
-  lastSync?: number;
-}
+export type ViewType = 'board' | 'timeline' | 'portfolio' | 'analytics';

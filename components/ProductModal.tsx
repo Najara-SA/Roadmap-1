@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Trash2, Box, Palette } from 'lucide-react';
 import { Product } from '../types';
+import { useTranslation } from '../hooks/useTranslation';
 
 interface ProductModalProps {
   isOpen: boolean;
@@ -12,11 +13,12 @@ interface ProductModalProps {
 }
 
 const COLORS = [
-  'bg-indigo-600', 'bg-emerald-600', 'bg-amber-600', 'bg-rose-600', 
-  'bg-sky-600', 'bg-purple-600', 'bg-slate-700', 'bg-orange-500'
+  'bg-indigo-600', 'bg-emerald-600', 'bg-amber-600', 'bg-rose-600',
+  'bg-sky-600', 'bg-violet-600', 'bg-slate-700', 'bg-fuchsia-600'
 ];
 
 const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, onDelete, product }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<Product>({
     id: '',
     name: '',
@@ -40,30 +42,30 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, on
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-gray-900/60 backdrop-blur-md p-4 animate-in fade-in duration-200">
-      <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-        <div className="px-8 pt-8 pb-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className={`h-10 w-10 ${formData.color} rounded-2xl shadow-lg flex items-center justify-center text-white`}>
-              <Box className="h-5 w-5" />
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 animate-in fade-in duration-300">
+      <div className="bg-white w-full max-w-md rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-500 ring-1 ring-slate-200/50">
+        <div className="px-10 pt-10 pb-6 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className={`h-12 w-12 ${formData.color} rounded-[1.25rem] shadow-xl flex items-center justify-center text-white ring-4 ring-white`}>
+              <Box className="h-6 w-6" />
             </div>
-            <h2 className="text-xl font-black text-gray-900 tracking-tight">
-              {product ? 'Edit Product' : 'New Product'}
+            <h2 className="text-2xl font-display font-black text-slate-900 tracking-tight">
+              {product ? t('edit') + ' ' + t('product') : t('newTheme')}
             </h2>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-            <X className="h-5 w-5 text-gray-400" />
+          <button onClick={onClose} className="p-2.5 hover:bg-slate-50 rounded-full transition-all text-slate-400 hover:text-slate-600">
+            <X className="h-6 w-6" />
           </button>
         </div>
 
-        <form onSubmit={(e) => { e.preventDefault(); onSave(formData); }} className="p-8 space-y-6">
-          <div className="space-y-4">
+        <form onSubmit={(e) => { e.preventDefault(); onSave(formData); }} className="p-10 space-y-8">
+          <div className="space-y-6">
             <div>
-              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Product Identity</label>
+              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('product')}</label>
               <input
                 required
                 type="text"
-                className="w-full px-5 py-3 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-600 outline-none transition-all font-bold text-gray-900"
+                className="w-full px-6 py-4 border border-slate-200 rounded-[1.5rem] focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 outline-none transition-all font-bold text-slate-900 text-lg shadow-sm placeholder:text-slate-300"
                 value={formData.name}
                 onChange={e => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Product Name..."
@@ -71,9 +73,9 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, on
             </div>
 
             <div>
-              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Strategic Vision</label>
+              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('description')}</label>
               <textarea
-                className="w-full px-5 py-3 border border-gray-200 rounded-2xl outline-none resize-none bg-gray-50/50 text-sm"
+                className="w-full px-6 py-4 border border-slate-200 rounded-[1.5rem] outline-none resize-none bg-slate-50/50 text-slate-700 min-h-[100px] focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 transition-all font-medium"
                 rows={3}
                 value={formData.description}
                 onChange={e => setFormData({ ...formData, description: e.target.value })}
@@ -82,43 +84,43 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, on
             </div>
 
             <div>
-              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Portfolio Color Branding</label>
-              <div className="flex flex-wrap gap-3">
+              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 ml-1">PORTFOLIO BRANDING</label>
+              <div className="grid grid-cols-4 gap-4">
                 {COLORS.map(c => (
                   <button
                     key={c}
                     type="button"
                     onClick={() => setFormData({ ...formData, color: c })}
-                    className={`h-8 w-8 rounded-xl transition-all ${c} ${formData.color === c ? 'ring-4 ring-offset-2 ring-indigo-500 scale-110' : 'opacity-80 hover:opacity-100'}`}
+                    className={`h-10 rounded-[1rem] transition-all ${c} ${formData.color === c ? 'ring-4 ring-offset-4 ring-indigo-500 scale-105 shadow-xl' : 'opacity-80 hover:opacity-100 hover:scale-105 shadow-sm'}`}
                   />
                 ))}
               </div>
             </div>
           </div>
 
-          <div className="pt-6 border-t border-gray-100 flex items-center justify-between">
+          <div className="pt-8 border-t border-slate-100 flex items-center justify-between">
             {product && onDelete && (
               <button
                 type="button"
                 onClick={() => onDelete(formData.id)}
-                className="text-red-500 hover:text-red-600 p-2 transition-colors"
+                className="text-rose-500 hover:bg-rose-50 p-3 rounded-2xl transition-all group"
               >
-                <Trash2 className="h-5 w-5" />
+                <Trash2 className="h-6 w-6 group-hover:scale-110 transition-transform" />
               </button>
             )}
-            <div className="flex gap-3 ml-auto">
+            <div className="flex gap-4 ml-auto">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-2.5 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition-all"
+                className="px-8 py-3 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-2xl transition-all"
               >
-                Cancel
+                {t('cancel')}
               </button>
               <button
                 type="submit"
-                className={`px-8 py-2.5 text-xs font-bold text-white rounded-xl shadow-xl transition-all active:scale-95 ${formData.color}`}
+                className={`px-10 py-3 text-sm font-bold text-white rounded-2xl shadow-xl transition-all active:scale-95 ${formData.color} shadow-${formData.color.split('-')[1]}-100`}
               >
-                {product ? 'Update Portfolio' : 'Add to Portfolio'}
+                {t('save')}
               </button>
             </div>
           </div>
