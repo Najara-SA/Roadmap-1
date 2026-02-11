@@ -50,11 +50,11 @@ const MilestoneModal: React.FC<MilestoneModalProps> = ({
         <form onSubmit={(e) => { e.preventDefault(); onSave(formData); }} className="p-10 space-y-8">
           <div className="space-y-6">
             <div>
-              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('title')}</label>
+              <label className="block text-sm font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('title')}</label>
               <input required type="text" className="w-full px-6 py-4 border border-slate-200 rounded-[1.5rem] focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 outline-none transition-all font-bold text-slate-900 text-lg shadow-sm placeholder:text-slate-300" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} placeholder="Key release..." />
             </div>
             <div>
-              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('description')}</label>
+              <label className="block text-sm font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('description')}</label>
               <textarea className="w-full px-6 py-4 border border-slate-200 rounded-[1.5rem] outline-none resize-none bg-slate-50/50 text-slate-700 min-h-[80px] focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 transition-all font-medium" rows={2} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
             </div>
           </div>

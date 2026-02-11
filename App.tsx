@@ -394,6 +394,21 @@ const App: React.FC = () => {
                 className="block w-full pl-11 pr-4 py-2.5 border border-slate-200 rounded-2xl text-sm font-medium bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all placeholder:text-slate-400"
               />
             </div>
+
+            <div className="flex items-center bg-slate-100/50 p-1 rounded-xl border border-slate-200/60 ml-2">
+              {['all', 'Q1', 'Q2', 'Q3', 'Q4'].map((q) => (
+                <button
+                  key={q}
+                  onClick={() => setActiveQuarter(q)}
+                  className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all uppercase tracking-wider ${activeQuarter === q
+                    ? 'bg-white text-indigo-600 shadow-sm ring-1 ring-slate-200'
+                    : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                >
+                  {q === 'all' ? t('all') : q}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="flex items-center gap-4">
@@ -462,8 +477,12 @@ const App: React.FC = () => {
               onEditProduct={(p) => { setSelectedProduct(p); setIsProductModalOpen(true); }}
               onEditMilestone={(m) => { setSelectedMilestone(m); setIsMilestoneModalOpen(true); }}
               onAddMilestone={(pid, m) => { setActiveContext({ productId: pid, month: m }); setSelectedMilestone(undefined); setIsMilestoneModalOpen(true); }}
-              onMoveItem={(id, month) => { const item = items.find(i => i.id === id); if (item) handleUpdateItem({ ...item, startMonth: month }); }}
+              onMoveItem={(id, updates) => {
+                const item = items.find(i => i.id === id);
+                if (item) handleUpdateItem({ ...item, ...updates });
+              }}
               activeVerticalId={activeVerticalId}
+              activeQuarter={activeQuarter}
             />
           )}
           {activeView === 'timeline' && <div className="p-8 h-full overflow-auto custom-scrollbar"><TimelineView items={items} milestones={milestones} onEditItem={(item) => { setSelectedItem(item); setIsModalOpen(true); }} /></div>}

@@ -27,7 +27,7 @@ const TimelineView: React.FC<TimelineViewProps> = ({ items, milestones, onEditIt
   return (
     <div className="max-w-4xl mx-auto py-8 px-6">
       <div className="mb-8 text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-bold uppercase tracking-wider mb-4">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold uppercase tracking-wider mb-4">
           <Target className="h-3.5 w-3.5" /> {t('strategicSequence')}
         </div>
         <h2 className="text-3xl font-display font-bold text-slate-900 tracking-tight">{t('executionTimeline')}</h2>
@@ -89,13 +89,13 @@ const TimelineItemCard: React.FC<{ item: RoadmapItem; milestones: Milestone[]; o
                 {item.milestoneId && (
                   <div className="flex items-center gap-1.5 px-2 py-0.5 bg-indigo-50 rounded-lg border border-indigo-100">
                     <div className="h-1.5 w-1.5 rounded-full bg-indigo-500"></div>
-                    <span className="text-[9px] font-bold text-indigo-600 uppercase tracking-wider">
+                    <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider">
                       {milestones.find(m => m.id === item.milestoneId)?.title || 'Milestone'}
                     </span>
                   </div>
                 )}
                 {totalCount > 0 && (
-                  <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded-md">
+                  <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-xs font-bold rounded-md">
                     {completedCount}/{totalCount}
                   </span>
                 )}
@@ -104,12 +104,12 @@ const TimelineItemCard: React.FC<{ item: RoadmapItem; milestones: Milestone[]; o
               {item.tags && item.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mt-2">
                   {item.tags.slice(0, 3).map((tag, idx) => (
-                    <span key={idx} className="px-2 py-0.5 bg-slate-100 text-slate-600 text-[9px] font-bold rounded uppercase tracking-wide">
+                    <span key={idx} className="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs font-bold rounded uppercase tracking-wide">
                       {tag}
                     </span>
                   ))}
                   {item.tags.length > 3 && (
-                    <span className="px-2 py-0.5 bg-slate-200 text-slate-500 text-[9px] font-bold rounded">+{item.tags.length - 3}</span>
+                    <span className="px-2 py-0.5 bg-slate-200 text-slate-500 text-xs font-bold rounded">+{item.tags.length - 3}</span>
                   )}
                 </div>
               )}
@@ -136,7 +136,7 @@ const TimelineItemCard: React.FC<{ item: RoadmapItem; milestones: Milestone[]; o
             onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }}
             className="w-full flex items-center justify-between px-5 py-3 hover:bg-slate-50 transition-all"
           >
-            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-wide">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wide">
               <ListTree className="h-4 w-4" />
               {t('cascadeDetails')}
             </div>

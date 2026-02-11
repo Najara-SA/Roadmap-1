@@ -64,7 +64,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, on
         <form onSubmit={(e) => { e.preventDefault(); onSave(formData); }} className="p-10 space-y-8">
           <div className="space-y-6">
             <div>
-              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('vertical')}</label>
+              <label className="block text-sm font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('vertical')}</label>
               <div className="relative">
                 <select
                   className="w-full px-5 py-3.5 border border-slate-200 rounded-2xl outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all"
@@ -77,7 +77,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, on
               </div>
             </div>
             <div>
-              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('product')}</label>
+              <label className="block text-sm font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('product')}</label>
               <input
                 required
                 type="text"
@@ -89,7 +89,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, on
             </div>
 
             <div>
-              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('description')}</label>
+              <label className="block text-sm font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('description')}</label>
               <textarea
                 className="w-full px-6 py-4 border border-slate-200 rounded-[1.5rem] outline-none resize-none bg-slate-50/50 text-slate-700 min-h-[100px] focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 transition-all font-medium"
                 rows={3}
@@ -100,7 +100,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, on
             </div>
 
             <div>
-              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4 ml-1">{t('branding')}</label>
+              <label className="block text-sm font-black text-slate-400 uppercase tracking-widest mb-4 ml-1">{t('branding')}</label>
               <div className="grid grid-cols-4 gap-4">
                 {COLORS.map(c => (
                   <button

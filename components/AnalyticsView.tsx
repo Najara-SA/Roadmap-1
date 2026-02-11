@@ -115,7 +115,7 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ items }) => {
               </ScatterChart>
             </ResponsiveContainer>
           </div>
-          <div className="mt-8 flex justify-between text-[11px] uppercase font-black text-slate-400 tracking-[0.2em]">
+          <div className="mt-8 flex justify-between text-xs uppercase font-black text-slate-400 tracking-[0.2em]">
             <span>{t('lowComplexity')}</span>
             <span>{t('highComplexity')}</span>
           </div>
@@ -155,7 +155,7 @@ const AnalyticsView: React.FC<AnalyticsViewProps> = ({ items }) => {
                 <div key={item.name} className="flex flex-col gap-1">
                   <div className="flex items-center gap-2.5">
                     <div className="h-3 w-3 rounded-full shadow-sm" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
-                    <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none">{item.name}</span>
+                    <span className="text-xs font-black text-slate-400 uppercase tracking-widest leading-none">{item.name}</span>
                   </div>
                   <span className="text-2xl font-black text-slate-900 ml-5.5">{item.value} <span className="text-xs text-slate-400 font-bold uppercase tracking-widest ml-1">Itens</span></span>
                 </div>
@@ -176,11 +176,11 @@ const StatCard: React.FC<{ label: string; value: number; subValue: string; icon:
         <Icon className="h-8 w-8" />
       </div>
     </div>
-    <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 relative z-10 leading-none">{label}</h4>
+    <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-2 relative z-10 leading-none">{label}</h4>
     <div className="text-5xl font-display font-black text-slate-900 mb-3 relative z-10 tracking-tight leading-none">{value}</div>
     <div className="flex items-center gap-2 relative z-10">
       <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-      <p className="text-[12px] text-emerald-600 font-black tracking-wide">{subValue}</p>
+      <p className="text-sm text-emerald-600 font-black tracking-wide">{subValue}</p>
     </div>
   </div>
 );

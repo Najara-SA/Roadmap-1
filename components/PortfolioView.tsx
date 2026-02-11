@@ -13,7 +13,7 @@ interface PortfolioViewProps {
   onEditProduct: (product: Product) => void;
   onEditMilestone: (milestone: Milestone) => void;
   onAddMilestone: (productId: string, month: number) => void;
-  onMoveItem: (itemId: string, newStartMonth: number) => void;
+  onMoveItem: (itemId: string, updates: Partial<RoadmapItem>) => void;
   activeVerticalId?: string;
   activeQuarter?: string;
 }
@@ -31,6 +31,32 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({
       : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   const QUARTERS = ['Q1', 'Q2', 'Q3', 'Q4'];
+
+  const handleDrop = (e: React.DragEvent, productId: string, verticalId?: string) => {
+    e.preventDefault();
+    if (!draggedItemId) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const width = rect.width;
+
+    const cols = activeQuarter === 'all' ? 12 : 3;
+    const colWidth = width / cols;
+    const colIndex = Math.max(0, Math.min(cols - 1, Math.floor(x / colWidth)));
+
+    let newMonth = colIndex;
+    if (activeQuarter !== 'all') {
+      const qIdx = QUARTERS.indexOf(activeQuarter);
+      newMonth = (qIdx * 3) + colIndex;
+    }
+
+    onMoveItem(draggedItemId, {
+      startMonth: newMonth,
+      productId: productId,
+      verticalId: verticalId
+    });
+    setDraggedItemId(null);
+  };
 
   return (
     <div className="h-full flex flex-col bg-white overflow-hidden">
@@ -67,24 +93,6 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({
             </div>
           ) : (
             verticals.map(family => {
-              const familyProducts = products.filter(p => p.familyId === family.id && items.some(i => i.productId === p.id));
-              // if (familyProducts.length === 0) return null; 
-              // We removed the return null check for the whole family block 2 steps ago?
-              // No, we removed `if (familyProducts.length === 0) return null;` logic earlier.
-
-              // Wait, previous state (before Step 1683) was:
-              // const familyProducts = products.filter(p => p.familyId === family.id && items.some(i => i.productId === p.id));
-              // if (familyProducts.length === 0) return null;
-
-              // Step 1683 changed it to:
-              // const familyProducts = products.filter(p => p.familyId === family.id);
-              // const familyOrphanItems = ...
-              // if (familyProducts.length === 0 && familyOrphanItems.length === 0) return null;
-
-              // Now I want to:
-              // Keep Orphan Items logic.
-              // Restrict familyProducts to ONLY those with items.
-
               const familyOrphanItems = items.filter(i => i.verticalId === family.id && (!i.productId || !products.some(p => p.id === i.productId)));
 
               // Only existing products with items are shown:
@@ -107,8 +115,12 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({
                   {visibleFamilyProducts.map(product => (
                     <div key={product.id} className="flex border-b border-slate-100 group/row bg-white transition-colors hover:bg-slate-50/30">
                       <RowHeader product={product} onEdit={() => onEditProduct(product)} />
-                      <div className="flex-1 relative min-h-[180px]">
-                        <GridBackground />
+                      <div
+                        className="flex-1 relative min-h-[180px]"
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={(e) => handleDrop(e, product.id, family.id)}
+                      >
+                        <GridBackground activeQuarter={activeQuarter} />
                         <div className={`relative p-8 grid ${activeQuarter === 'all' ? 'grid-cols-12' : 'grid-cols-3'} gap-y-6 auto-rows-min`}>
                           {items
                             .filter(item => item.productId === product.id && (activeQuarter === 'all' || item.quarter.startsWith(activeQuarter)))
@@ -131,7 +143,11 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({
                           <h3 className="font-display font-medium text-slate-500 leading-tight text-sm tracking-tight">{t('standaloneThemes') || 'Temas Avulsos'}</h3>
                         </div>
                       </div>
-                      <div className="flex-1 relative min-h-[180px]">
+                      <div
+                        className="flex-1 relative min-h-[180px]"
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={(e) => handleDrop(e, '', family.id)}
+                      >
                         <GridBackground activeQuarter={activeQuarter} />
                         <div className={`relative p-8 grid ${activeQuarter === 'all' ? 'grid-cols-12' : 'grid-cols-3'} gap-y-6 auto-rows-min`}>
                           {familyOrphanItems
@@ -163,7 +179,11 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({
               {products.filter(p => !p.familyId).map(product => (
                 <div key={product.id} className="flex border-b border-slate-100 group/row bg-white transition-colors hover:bg-slate-50/30">
                   <RowHeader product={product} onEdit={() => onEditProduct(product)} />
-                  <div className="flex-1 relative min-h-[180px]">
+                  <div
+                    className="flex-1 relative min-h-[180px]"
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => handleDrop(e, product.id, '')}
+                  >
                     <GridBackground activeQuarter={activeQuarter} />
                     <div className={`relative p-8 grid ${activeQuarter === 'all' ? 'grid-cols-12' : 'grid-cols-3'} gap-y-6 auto-rows-min`}>
                       {items
@@ -188,7 +208,11 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({
                     </div>
                     <p className="text-[11px] text-slate-400 font-medium leading-relaxed">{t('standaloneDesc') || 'Itens não associados a um módulo específico.'}</p>
                   </div>
-                  <div className="flex-1 relative min-h-[180px]">
+                  <div
+                    className="flex-1 relative min-h-[180px]"
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => handleDrop(e, '', '')}
+                  >
                     <GridBackground activeQuarter={activeQuarter} />
                     <div className={`relative p-8 grid ${activeQuarter === 'all' ? 'grid-cols-12' : 'grid-cols-3'} gap-y-6 auto-rows-min`}>
                       {items
