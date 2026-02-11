@@ -167,8 +167,8 @@ const App: React.FC = () => {
       setSyncStatus('syncing');
       const { error } = await supabase.from('roadmap_items').upsert({
         id: updatedItem.id,
-        product_id: updatedItem.productId,
-        team_id: updatedItem.verticalId,
+        product_id: updatedItem.productId || null,
+        team_id: updatedItem.verticalId || null,
         title: updatedItem.title,
         description: updatedItem.description,
         status: updatedItem.status,
