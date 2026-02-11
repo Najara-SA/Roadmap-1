@@ -187,8 +187,11 @@ const ItemModal: React.FC<ItemModalProps> = ({
                   <select className="w-full px-5 py-3.5 border border-slate-200 rounded-2xl outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all" value={formData.verticalId} onChange={e => {
                     const newVid = e.target.value;
                     const validProducts = products.filter(p => p.familyId === newVid);
+                    // Reset to empty (General) or first product?
+                    // User says "Insert in Family AND Subproduct". Defaulting to first product is helpful, but allow empty.
                     setFormData({ ...formData, verticalId: newVid, productId: validProducts[0]?.id || '' });
                   }}>
+                    <option value="">{t('standalone') || 'Tema Avulso (Sem Família)'}</option>
                     {verticals.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
                   </select>
                   <ChevronDown className="absolute right-4 top-4 h-4 w-4 text-slate-400 pointer-events-none" />
@@ -198,6 +201,7 @@ const ItemModal: React.FC<ItemModalProps> = ({
                 <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('product')}</label>
                 <div className="relative">
                   <select className="w-full px-5 py-3.5 border border-slate-200 rounded-2xl outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all" value={formData.productId} onChange={e => setFormData({ ...formData, productId: e.target.value, milestoneId: '' })}>
+                    <option value="">{t('unlinked') || 'Sem Subproduto (Geral)'}</option>
                     {products.filter(p => p.familyId === formData.verticalId).map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                   </select>
                   <ChevronDown className="absolute right-4 top-4 h-4 w-4 text-slate-400 pointer-events-none" />

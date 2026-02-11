@@ -63,14 +63,30 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({
             </div>
           ) : (
             verticals.map(family => {
-              const familyProducts = products.filter(p => p.familyId === family.id);
-              // if (familyProducts.length === 0) return null; // Logic removed to allow families with just items to show?
-              // Actually, user wants to see Family even if no products? "A family NOT have a subproduct"
-              // If family has no products AND no items, maybe hide?
-              // But let's verify later. For now, show if it has anything.
+              const familyProducts = products.filter(p => p.familyId === family.id && items.some(i => i.productId === p.id));
+              // if (familyProducts.length === 0) return null; 
+              // We removed the return null check for the whole family block 2 steps ago?
+              // No, we removed `if (familyProducts.length === 0) return null;` logic earlier.
+
+              // Wait, previous state (before Step 1683) was:
+              // const familyProducts = products.filter(p => p.familyId === family.id && items.some(i => i.productId === p.id));
+              // if (familyProducts.length === 0) return null;
+
+              // Step 1683 changed it to:
+              // const familyProducts = products.filter(p => p.familyId === family.id);
+              // const familyOrphanItems = ...
+              // if (familyProducts.length === 0 && familyOrphanItems.length === 0) return null;
+
+              // Now I want to:
+              // Keep Orphan Items logic.
+              // Restrict familyProducts to ONLY those with items.
+
               const familyOrphanItems = items.filter(i => i.verticalId === family.id && (!i.productId || !products.some(p => p.id === i.productId)));
 
-              if (familyProducts.length === 0 && familyOrphanItems.length === 0) return null;
+              // Only existing products with items are shown:
+              const visibleFamilyProducts = products.filter(p => p.familyId === family.id && items.some(i => i.productId === p.id));
+
+              if (visibleFamilyProducts.length === 0 && familyOrphanItems.length === 0) return null;
 
               return (
                 <div key={family.id} className="border-b-4 border-slate-200/40">
@@ -84,7 +100,7 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({
                   </div>
 
                   {/* Sub-products Rows */}
-                  {familyProducts.map(product => (
+                  {visibleFamilyProducts.map(product => (
                     <div key={product.id} className="flex border-b border-slate-100 group/row bg-white transition-colors hover:bg-slate-50/30">
                       <RowHeader product={product} onEdit={() => onEditProduct(product)} />
                       <div className="flex-1 relative min-h-[180px]">
@@ -152,8 +168,8 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({
                 </div>
               ))}
 
-              {/* Items without Product */}
-              {items.filter(i => !i.productId || !products.some(p => p.id === i.productId)).length > 0 && (
+              {/* Items without Product AND without Family (True Orphans) */}
+              {items.filter(i => (!i.productId || !products.some(p => p.id === i.productId)) && !verticals.some(v => v.id === i.verticalId)).length > 0 && (
                 <div className="flex border-b border-slate-100 group/row bg-slate-50/30">
                   <div className="w-64 flex-shrink-0 p-8 border-r border-slate-200/60 sticky left-0 z-30 bg-slate-50/50">
                     <div className="flex items-center gap-3 mb-4">
@@ -168,7 +184,7 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({
                     <GridBackground />
                     <div className="relative p-8 grid grid-cols-12 gap-y-6 auto-rows-min">
                       {items
-                        .filter(i => !i.productId || !products.some(p => p.id === i.productId))
+                        .filter(i => (!i.productId || !products.some(p => p.id === i.productId)) && !verticals.some(v => v.id === i.verticalId))
                         .map(item => (
                           <ItemWrapper key={item.id} item={item} milestones={milestones} onEdit={() => onEditItem(item)} onDragStart={() => setDraggedItemId(item.id)} />
                         ))}
