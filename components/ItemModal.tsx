@@ -47,6 +47,10 @@ const ItemModal: React.FC<ItemModalProps> = ({
 
   useEffect(() => {
     if (item) {
+      // Logic to auto-fix inconsistency: if Product has a family, prefer that family over item's verticalId
+      const product = products.find(p => p.id === item.productId);
+      const effectiveVerticalId = (product && product.familyId) ? product.familyId : (item.verticalId || verticals[0]?.id || '');
+
       setFormData({
         title: item.title,
         description: item.description,
@@ -54,7 +58,7 @@ const ItemModal: React.FC<ItemModalProps> = ({
         priority: item.priority,
         startMonth: item.startMonth || 0,
         spanMonths: item.spanMonths || 1,
-        verticalId: item.verticalId,
+        verticalId: effectiveVerticalId,
         productId: item.productId,
         milestoneId: item.milestoneId || '',
         effort: item.effort,
@@ -62,8 +66,16 @@ const ItemModal: React.FC<ItemModalProps> = ({
         tagsString: (item.tags || []).join(', '),
         subFeatures: item.subFeatures || []
       });
-    } else if (verticals.length > 0 && products.length > 0) {
-      setFormData(prev => ({ ...prev, verticalId: verticals[0].id, productId: products[0].id }));
+    } else if (verticals.length > 0) {
+      // Smart default: Select first vertical, then select first product belonging to it
+      const initialVerticalId = verticals[0].id;
+      const validProducts = products.filter(p => p.familyId === initialVerticalId);
+
+      setFormData(prev => ({
+        ...prev,
+        verticalId: initialVerticalId,
+        productId: validProducts[0]?.id || ''
+      }));
     }
   }, [item, verticals, products]);
 
