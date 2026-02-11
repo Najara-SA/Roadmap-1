@@ -62,17 +62,17 @@ const Sidebar: React.FC<SidebarProps> = ({
           </div>
           <div>
             <h2 className="font-display font-black text-slate-900 leading-none text-xl tracking-tight">Roadmap MD</h2>
-            <p className="text-[10px] text-indigo-600/80 font-bold uppercase tracking-[0.2em] mt-1 italic">Product Vision</p>
+            <p className="text-xs text-indigo-600/80 font-bold uppercase tracking-[0.2em] mt-1 italic">Product Vision</p>
           </div>
         </div>
 
         <div className="mb-10">
-          <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] leading-none font-display mb-4 ml-1">{t('context')}</label>
+          <label className="block text-xs font-black text-slate-400 uppercase tracking-[0.15em] leading-none font-display mb-4 ml-1">{t('context')}</label>
           <div className="relative group">
             <select
               value={activeVerticalId}
               onChange={(e) => onVerticalChange(e.target.value)}
-              className="w-full pl-10 pr-8 py-4 text-[13px] font-bold text-slate-700 bg-slate-50 border border-slate-200/50 rounded-2xl appearance-none focus:outline-none focus:ring-4 focus:ring-indigo-500/10 cursor-pointer transition-all hover:bg-white hover:border-indigo-200/50 shadow-sm"
+              className="w-full pl-10 pr-8 py-4 text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200/50 rounded-2xl appearance-none focus:outline-none focus:ring-4 focus:ring-indigo-500/10 cursor-pointer transition-all hover:bg-white hover:border-indigo-200/50 shadow-sm"
             >
               <option value="all">{t('all')}</option>
               {verticals.map(v => (
@@ -92,7 +92,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl transition-all duration-300 group ${activeView === item.id ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-100 translate-x-1' : 'text-slate-500 hover:bg-indigo-50 hover:text-indigo-600'}`}
             >
               <item.icon className={`h-5 w-5 ${activeView === item.id ? 'text-white' : 'text-slate-400 group-hover:text-indigo-500'}`} />
-              <span className="text-[13px] font-bold tracking-tight">{item.label}</span>
+              <span className="text-sm font-bold tracking-tight">{item.label}</span>
             </button>
           ))}
         </nav>
@@ -103,14 +103,14 @@ const Sidebar: React.FC<SidebarProps> = ({
         <div className="p-6 bg-indigo-50 border border-indigo-100/50 rounded-3xl group transition-all">
           <div className="flex items-center gap-2.5 mb-4">
             <Target className="h-4 w-4 text-indigo-500" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600">Q1 Progress</span>
+            <span className="text-xs font-black uppercase tracking-widest text-indigo-600">Q1 Progress</span>
           </div>
-          <p className="text-[11px] font-bold leading-relaxed mb-4 text-slate-500">{activeVerticalId === 'all' ? 'All Families' : verticals.find(v => v.id === activeVerticalId)?.name}</p>
+          <p className="text-sm font-bold leading-relaxed mb-4 text-slate-500">{activeVerticalId === 'all' ? 'All Families' : verticals.find(v => v.id === activeVerticalId)?.name}</p>
           <div className="bg-slate-200/50 h-1.5 rounded-full overflow-hidden">
             <div className="bg-indigo-500 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(99,102,241,0.3)]" style={{ width: `${quarterProgress}%` }}></div>
           </div>
           <div className="mt-2 text-right">
-            <span className="text-[10px] font-black text-indigo-600">{Math.round(quarterProgress)}%</span>
+            <span className="text-xs font-black text-indigo-600">{Math.round(quarterProgress)}%</span>
           </div>
         </div>
 
@@ -118,19 +118,19 @@ const Sidebar: React.FC<SidebarProps> = ({
         <div className="p-6 bg-gradient-to-br from-indigo-600 to-violet-700 rounded-3xl text-white shadow-2xl shadow-indigo-100 relative overflow-hidden group">
           <div className="flex items-center gap-2.5 mb-4">
             <Target className="h-4 w-4 text-indigo-200" />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-100">Progresso Geral</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-indigo-100">Progresso Geral</span>
           </div>
-          <p className="text-[11px] font-bold leading-relaxed mb-4 text-white/90">Consolidado da Família</p>
+          <p className="text-sm font-bold leading-relaxed mb-4 text-white/90">Consolidado da Família</p>
           <div className="bg-white/20 h-1.5 rounded-full overflow-hidden">
             <div className="bg-emerald-400 h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(52,211,153,0.5)]" style={{ width: `${overallProgress}%` }}></div>
           </div>
           <div className="mt-2 text-right">
-            <span className="text-[10px] font-black text-white">{Math.round(overallProgress)}%</span>
+            <span className="text-xs font-black text-white">{Math.round(overallProgress)}%</span>
           </div>
           <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
         </div>
 
-        <button onClick={onOpenSettings} className="w-full flex items-center gap-3 px-4 py-3 text-[11px] font-bold text-slate-400 hover:text-indigo-600 transition-all uppercase tracking-widest hover:bg-indigo-50 rounded-2xl">
+        <button onClick={onOpenSettings} className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-400 hover:text-indigo-600 transition-all uppercase tracking-widest hover:bg-indigo-50 rounded-2xl">
           <Settings className="h-4 w-4" />
           {t('systemConfiguration')}
         </button>

@@ -24,6 +24,7 @@ const App: React.FC = () => {
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [verticals, setVerticals] = useState<Vertical[]>([]);
   const [activeVerticalId, setActiveVerticalId] = useState<string>('all');
+  const [activeQuarter, setActiveQuarter] = useState<string>('all');
   const [syncStatus, setSyncStatus] = useState<'synced' | 'syncing' | 'error' | 'offline'>('offline');
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -408,7 +409,7 @@ const App: React.FC = () => {
               ) : (
                 <AlertTriangle className="h-3.5 w-3.5" />
               )}
-              <span className="text-[10px] font-bold uppercase tracking-widest leading-none">
+              <span className="text-xs font-bold uppercase tracking-widest leading-none">
                 {syncStatus === 'syncing' ? t('syncing') : syncStatus === 'synced' ? t('supabaseLive') : syncStatus === 'offline' ? t('localSafe') : t('connError')}
               </span>
             </div>
@@ -420,7 +421,7 @@ const App: React.FC = () => {
                 <button
                   key={lang}
                   onClick={() => changeLanguage(lang)}
-                  className={`px-3 py-1.5 text-[10px] font-bold rounded-lg transition-all uppercase tracking-wider ${language === lang
+                  className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all uppercase tracking-wider ${language === lang
                     ? 'bg-white text-indigo-600 shadow-sm ring-1 ring-slate-200'
                     : 'text-slate-500 hover:text-slate-700'
                     }`}
@@ -433,7 +434,7 @@ const App: React.FC = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => { setSelectedProduct(undefined); setIsProductModalOpen(true); }}
-                className="flex items-center gap-2 px-5 py-3 text-[11px] font-bold uppercase tracking-wider text-slate-600 hover:text-indigo-600 bg-white border border-slate-200 rounded-2xl hover:border-indigo-100 transition-all active:scale-95 shadow-sm"
+                className="flex items-center gap-2 px-5 py-3 text-sm font-bold uppercase tracking-wider text-slate-600 hover:text-indigo-600 bg-white border border-slate-200 rounded-2xl hover:border-indigo-100 transition-all active:scale-95 shadow-sm"
               >
                 <Briefcase className="h-4 w-4" />
                 {t('newProduct')}
@@ -441,7 +442,7 @@ const App: React.FC = () => {
 
               <button
                 onClick={() => { setSelectedItem(undefined); setIsModalOpen(true); }}
-                className="group flex items-center gap-2 px-6 py-3 text-[11px] font-bold uppercase tracking-wider text-white bg-indigo-600 rounded-2xl hover:bg-indigo-700 shadow-xl shadow-indigo-200 transition-all active:scale-95 active:shadow-none"
+                className="group flex items-center gap-2 px-6 py-3 text-sm font-bold uppercase tracking-wider text-white bg-indigo-600 rounded-2xl hover:bg-indigo-700 shadow-xl shadow-indigo-200 transition-all active:scale-95 active:shadow-none"
               >
                 <Plus className="h-4 w-4 group-hover:rotate-90 transition-transform duration-300" />
                 {t('newTheme')}
