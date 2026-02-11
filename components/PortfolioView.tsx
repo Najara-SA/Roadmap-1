@@ -14,10 +14,11 @@ interface PortfolioViewProps {
   onEditMilestone: (milestone: Milestone) => void;
   onAddMilestone: (productId: string, month: number) => void;
   onMoveItem: (itemId: string, newStartMonth: number) => void;
+  activeVerticalId?: string;
 }
 
 const PortfolioView: React.FC<PortfolioViewProps> = ({
-  items, products, verticals, milestones, onEditItem, onEditProduct, onEditMilestone, onAddMilestone, onMoveItem
+  items, products, verticals, milestones, onEditItem, onEditProduct, onEditMilestone, onAddMilestone, onMoveItem, activeVerticalId = 'all'
 }) => {
   const { t, language } = useTranslation();
   const [draggedItemId, setDraggedItemId] = useState<string | null>(null);
@@ -97,8 +98,8 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({
             })
           )}
 
-          {/* Seção Geral para Itens Sem Vínculo (Show only if there are unlinked items or products) */}
-          {(products.filter(p => !p.familyId).length > 0 || items.filter(i => !i.productId || !products.some(p => p.id === i.productId)).length > 0) && (
+          {/* Seção Geral para Itens Sem Vínculo (Show only if there are unlinked items or products AND we are in 'all' view) */}
+          {activeVerticalId === 'all' && (products.filter(p => !p.familyId).length > 0 || items.filter(i => !i.productId || !products.some(p => p.id === i.productId)).length > 0) && (
             <div className="border-b-4 border-slate-200/40 opacity-90 hover:opacity-100 transition-opacity">
               <div className="flex bg-slate-100/80 border-b border-slate-200/60 sticky left-0 z-20">
                 <div className="w-64 flex-shrink-0 p-4 pl-8 border-r border-slate-200/60 flex items-center gap-3">

@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { X, Trash2, Flag, Calendar, ChevronDown } from 'lucide-react';
+import { X, Trash2, Flag } from 'lucide-react';
 import { Milestone } from '../types';
 import { useTranslation } from '../hooks/useTranslation';
 
@@ -10,26 +9,16 @@ interface MilestoneModalProps {
   onSave: (milestone: Milestone) => void;
   onDelete?: (id: string) => void;
   milestone?: Milestone;
-  productId: string;
-  month: number;
 }
 
 const MilestoneModal: React.FC<MilestoneModalProps> = ({
-  isOpen, onClose, onSave, onDelete, milestone, productId, month
+  isOpen, onClose, onSave, onDelete, milestone
 }) => {
-  const { t, language } = useTranslation();
-
-  const MONTH_NAMES = language === 'pt'
-    ? ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
-    : language === 'es'
-      ? ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
-      : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState<Milestone>({
     id: '',
-    productId: productId,
     title: '',
-    month: month || 0,
     description: ''
   });
 
@@ -39,13 +28,11 @@ const MilestoneModal: React.FC<MilestoneModalProps> = ({
     } else {
       setFormData({
         id: Math.random().toString(36).substring(2, 9),
-        productId: productId,
         title: '',
-        month: month || 0,
         description: ''
       });
     }
-  }, [milestone, productId, month, isOpen]);
+  }, [milestone, isOpen]);
 
   if (!isOpen) return null;
 
@@ -65,16 +52,6 @@ const MilestoneModal: React.FC<MilestoneModalProps> = ({
             <div>
               <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('title')}</label>
               <input required type="text" className="w-full px-6 py-4 border border-slate-200 rounded-[1.5rem] focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 outline-none transition-all font-bold text-slate-900 text-lg shadow-sm placeholder:text-slate-300" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} placeholder="Key release..." />
-            </div>
-            <div>
-              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('startDate')}</label>
-              <div className="relative">
-                <select className="w-full pl-6 pr-10 py-4 border border-slate-200 rounded-[1.5rem] outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all" value={formData.month} onChange={e => setFormData({ ...formData, month: parseInt(e.target.value) })}>
-                  {MONTH_NAMES.map((m, i) => <option key={m} value={i}>{m}</option>)}
-                </select>
-                <ChevronDown className="absolute right-4 top-5 h-4 w-4 text-slate-400 pointer-events-none" />
-                <Calendar className="absolute left-4 top-5 h-4 w-4 text-indigo-400" />
-              </div>
             </div>
             <div>
               <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('description')}</label>

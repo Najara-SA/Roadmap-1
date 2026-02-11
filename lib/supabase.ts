@@ -42,3 +42,19 @@ export const isSupabaseReady = () => {
 // Placeholder for legacy interface compatibility during refactor
 export const saveSupabaseConfig = () => { };
 export const clearSupabaseConfig = () => { };
+
+export const checkConnection = async (): Promise<boolean> => {
+  const client = getSupabaseClient();
+  if (!client) return false;
+  try {
+    const { error } = await client.from('roadmap_items').select('count', { count: 'exact', head: true });
+    if (error) {
+      console.warn("Supabase connection check failed:", error.message);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error("Supabase connection check exception:", e);
+    return false;
+  }
+};

@@ -30,9 +30,7 @@ export interface PersistenceState {
 
 export interface Milestone {
   id: string;
-  productId: string;
   title: string;
-  month: number; // 0-11
   description: string;
 }
 

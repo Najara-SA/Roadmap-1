@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Plus, Trash2, Edit3, Users, Target, Palette } from 'lucide-react';
+import { X, Plus, Trash2, Edit3, Users, Target } from 'lucide-react';
 import { Vertical, Milestone, Product } from '../types';
 import { useTranslation } from '../hooks/useTranslation';
 
@@ -13,6 +13,8 @@ interface SettingsModalProps {
     onDeleteVertical: (id: string) => void;
     onSaveMilestone: (milestone: Milestone) => void;
     onDeleteMilestone: (id: string) => void;
+    onSaveProduct: (product: Product) => void;
+    onDeleteProduct: (id: string) => void;
 }
 
 const COLORS = [
@@ -29,7 +31,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     onSaveVertical,
     onDeleteVertical,
     onSaveMilestone,
-    onDeleteMilestone
+    onDeleteMilestone,
+    onSaveProduct,
+    onDeleteProduct
 }) => {
     const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState<'families' | 'milestones'>('families');
@@ -41,10 +45,15 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     // Milestone state
     const [newMilestone, setNewMilestone] = useState({
         title: '',
-        description: '',
-        productId: products[0]?.id || '',
-        month: 0
+        description: ''
     });
+
+    // Sub-products state
+    const [expandedFamilyId, setExpandedFamilyId] = useState<string | null>(null);
+    const [newProductName, setNewProductName] = useState('');
+
+    // Editing state
+    const [editingFamily, setEditingFamily] = useState<Vertical | null>(null);
 
     if (!isOpen) return null;
 
@@ -69,10 +78,28 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         onSaveMilestone(milestone);
         setNewMilestone({
             title: '',
-            description: '',
-            productId: products[0]?.id || '',
-            month: 0
+            description: ''
         });
+    };
+
+    const handleAddProduct = (familyId: string) => {
+        if (!newProductName.trim()) return;
+        const newProduct: Product = {
+            id: Math.random().toString(36).substring(2, 9),
+            familyId,
+            name: newProductName,
+            description: '',
+            color: 'bg-indigo-500'
+        };
+        onSaveProduct(newProduct);
+        setNewProductName('');
+    };
+
+    const handleUpdateFamily = () => {
+        if (editingFamily && editingFamily.name.trim()) {
+            onSaveVertical(editingFamily);
+            setEditingFamily(null);
+        }
     };
 
     return (
@@ -92,8 +119,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                         <button
                             onClick={() => setActiveTab('families')}
                             className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeTab === 'families'
-                                    ? 'bg-indigo-600 text-white shadow-lg'
-                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                ? 'bg-indigo-600 text-white shadow-lg'
+                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                                 }`}
                         >
                             <Users className="h-4 w-4 inline mr-2" />
@@ -102,8 +129,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                         <button
                             onClick={() => setActiveTab('milestones')}
                             className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeTab === 'milestones'
-                                    ? 'bg-indigo-600 text-white shadow-lg'
-                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                ? 'bg-indigo-600 text-white shadow-lg'
+                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                                 }`}
                         >
                             <Target className="h-4 w-4 inline mr-2" />
@@ -156,15 +183,94 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                     <p className="text-sm text-slate-400 text-center py-8">{t('noFamilies')}</p>
                                 ) : (
                                     verticals.map(family => (
-                                        <div key={family.id} className="flex items-center gap-3 p-4 bg-white border border-slate-200 rounded-xl hover:border-indigo-200 transition-all group">
-                                            <div className={`h-10 w-10 ${family.color} rounded-xl flex-shrink-0`}></div>
-                                            <span className="flex-1 font-bold text-slate-900">{family.name}</span>
-                                            <button
-                                                onClick={() => onDeleteVertical(family.id)}
-                                                className="p-2 hover:bg-rose-50 text-slate-400 hover:text-rose-500 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </button>
+                                        <div key={family.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden transition-all hover:border-indigo-200">
+                                            <div className="flex items-center gap-3 p-4 group">
+                                                {editingFamily?.id === family.id ? (
+                                                    <div className="flex-1 flex items-center gap-2">
+                                                        <div className="flex gap-1">
+                                                            {COLORS.map(color => (
+                                                                <button
+                                                                    key={color}
+                                                                    onClick={() => setEditingFamily({ ...editingFamily, color })}
+                                                                    className={`h-6 w-6 rounded-md ${color} ${editingFamily.color === color ? 'ring-2 ring-offset-1 ring-indigo-500' : 'opacity-50'}`}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                        <input
+                                                            type="text"
+                                                            value={editingFamily.name}
+                                                            onChange={(e) => setEditingFamily({ ...editingFamily, name: e.target.value })}
+                                                            className="flex-1 px-3 py-1.5 border border-indigo-200 rounded-lg text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500/20"
+                                                            autoFocus
+                                                        />
+                                                        <button onClick={handleUpdateFamily} className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100"><Edit3 className="h-4 w-4" /></button>
+                                                        <button onClick={() => setEditingFamily(null)} className="p-1.5 text-slate-400 hover:text-slate-600"><X className="h-4 w-4" /></button>
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <div
+                                                            onClick={() => setExpandedFamilyId(expandedFamilyId === family.id ? null : family.id)}
+                                                            className={`h-10 w-10 ${family.color} rounded-xl flex-shrink-0 cursor-pointer hover:scale-105 transition-transform`}
+                                                        />
+                                                        <span
+                                                            className="flex-1 font-bold text-slate-900 cursor-pointer"
+                                                            onClick={() => setExpandedFamilyId(expandedFamilyId === family.id ? null : family.id)}
+                                                        >
+                                                            {family.name}
+                                                        </span>
+                                                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <button
+                                                                onClick={() => setEditingFamily(family)}
+                                                                className="p-2 hover:bg-slate-50 text-slate-400 hover:text-indigo-500 rounded-lg transition-all"
+                                                            >
+                                                                <Edit3 className="h-4 w-4" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => onDeleteVertical(family.id)}
+                                                                className="p-2 hover:bg-rose-50 text-slate-400 hover:text-rose-500 rounded-lg transition-all"
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </button>
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
+
+                                            {/* Nested Modules/Products */}
+                                            {expandedFamilyId === family.id && (
+                                                <div className="bg-slate-50/50 border-t border-slate-100 p-4 pl-16 space-y-3 animate-in slide-in-from-top-2 duration-200">
+                                                    <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('modules')}</h4>
+
+                                                    {products.filter(p => p.familyId === family.id).map(product => (
+                                                        <div key={product.id} className="flex items-center justify-between gap-3 p-2 bg-white rounded-lg border border-slate-200/50 group/product">
+                                                            <span className="text-sm font-medium text-slate-700">{product.name}</span>
+                                                            <button
+                                                                onClick={() => onDeleteProduct(product.id)}
+                                                                className="p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-md opacity-0 group-hover/product:opacity-100 transition-all"
+                                                            >
+                                                                <Trash2 className="h-3.5 w-3.5" />
+                                                            </button>
+                                                        </div>
+                                                    ))}
+
+                                                    <div className="flex gap-2 mt-2">
+                                                        <input
+                                                            type="text"
+                                                            placeholder={t('newModule')}
+                                                            className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-300"
+                                                            value={newProductName}
+                                                            onChange={(e) => setNewProductName(e.target.value)}
+                                                            onKeyPress={(e) => e.key === 'Enter' && handleAddProduct(family.id)}
+                                                        />
+                                                        <button
+                                                            onClick={() => handleAddProduct(family.id)}
+                                                            className="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                                                        >
+                                                            <Plus className="h-4 w-4" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     ))
                                 )}
@@ -189,29 +295,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                     value={newMilestone.description}
                                     onChange={(e) => setNewMilestone({ ...newMilestone, description: e.target.value })}
                                 />
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-2">{t('product')}</label>
-                                        <select
-                                            className="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/20 font-medium"
-                                            value={newMilestone.productId}
-                                            onChange={(e) => setNewMilestone({ ...newMilestone, productId: e.target.value })}
-                                        >
-                                            {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-500 uppercase mb-2">{t('month')}</label>
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            max="11"
-                                            className="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/20 font-medium"
-                                            value={newMilestone.month}
-                                            onChange={(e) => setNewMilestone({ ...newMilestone, month: parseInt(e.target.value) })}
-                                        />
-                                    </div>
-                                </div>
                                 <button
                                     onClick={handleAddMilestone}
                                     className="w-full px-4 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all"
@@ -233,11 +316,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                                 <div className="flex-1">
                                                     <h4 className="font-bold text-slate-900 mb-1">{milestone.title}</h4>
                                                     <p className="text-sm text-slate-500">{milestone.description}</p>
-                                                    <div className="flex items-center gap-2 mt-2">
-                                                        <span className="text-xs font-bold text-slate-400">{products.find(p => p.id === milestone.productId)?.name}</span>
-                                                        <span className="text-xs text-slate-300">•</span>
-                                                        <span className="text-xs font-bold text-indigo-600">{t('month')} {milestone.month + 1}</span>
-                                                    </div>
                                                 </div>
                                                 <button
                                                     onClick={() => onDeleteMilestone(milestone.id)}

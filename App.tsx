@@ -270,9 +270,7 @@ const App: React.FC = () => {
       setSyncStatus('syncing');
       const { error } = await supabase.from('milestones').upsert({
         id: milestone.id,
-        product_id: milestone.productId,
         title: milestone.title,
-        month: milestone.month,
         description: milestone.description
       });
       if (error) {
@@ -447,6 +445,7 @@ const App: React.FC = () => {
               onEditMilestone={(m) => { setSelectedMilestone(m); setIsMilestoneModalOpen(true); }}
               onAddMilestone={(pid, m) => { setActiveContext({ productId: pid, month: m }); setSelectedMilestone(undefined); setIsMilestoneModalOpen(true); }}
               onMoveItem={(id, month) => { const item = items.find(i => i.id === id); if (item) handleUpdateItem({ ...item, startMonth: month }); }}
+              activeVerticalId={activeVerticalId}
             />
           )}
           {activeView === 'timeline' && <div className="p-8 h-full overflow-auto custom-scrollbar"><TimelineView items={items} milestones={milestones} onEditItem={(item) => { setSelectedItem(item); setIsModalOpen(true); }} /></div>}
@@ -475,8 +474,6 @@ const App: React.FC = () => {
             await persistChanges(items, products, next, verticals);
           } : undefined}
           milestone={selectedMilestone}
-          productId={activeContext.productId}
-          month={activeContext.month || 0}
         />
       )}
       {isSettingsModalOpen && (
@@ -488,6 +485,8 @@ const App: React.FC = () => {
           products={products}
           onSaveVertical={handleSaveVertical}
           onDeleteVertical={handleDeleteVertical}
+          onSaveProduct={handleSaveProduct}
+          onDeleteProduct={handleDeleteProduct}
           onSaveMilestone={async (milestone) => {
             const isNew = !milestones.some(m => m.id === milestone.id);
             const nextMilestones = !isNew
@@ -499,10 +498,8 @@ const App: React.FC = () => {
               setSyncStatus('syncing');
               const { error } = await supabase.from('milestones').upsert({
                 id: milestone.id,
-                product_id: milestone.productId,
                 title: milestone.title,
-                description: milestone.description,
-                month: milestone.month
+                description: milestone.description
               });
               if (error) { console.error("Error saving milestone:", error); setSyncStatus('error'); }
               else setSyncStatus('synced');
