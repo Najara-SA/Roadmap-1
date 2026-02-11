@@ -51,6 +51,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     // Sub-products state
     const [expandedFamilyId, setExpandedFamilyId] = useState<string | null>(null);
     const [newProductName, setNewProductName] = useState('');
+    const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
     // Editing state
     const [editingFamily, setEditingFamily] = useState<Vertical | null>(null);
@@ -102,6 +103,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         if (editingFamily && editingFamily.name.trim()) {
             onSaveVertical({ ...editingFamily, _synced: false });
             setEditingFamily(null);
+        }
+    };
+
+    const handleUpdateProduct = () => {
+        if (editingProduct && editingProduct.name.trim()) {
+            onSaveProduct({ ...editingProduct, _synced: false });
+            setEditingProduct(null);
         }
     };
 
@@ -246,13 +254,38 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
                                                     {products.filter(p => p.familyId === family.id).map(product => (
                                                         <div key={product.id} className="flex items-center justify-between gap-3 p-2 bg-white rounded-lg border border-slate-200/50 group/product">
-                                                            <span className="text-sm font-medium text-slate-700">{product.name}</span>
-                                                            <button
-                                                                onClick={() => onDeleteProduct(product.id)}
-                                                                className="p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-md opacity-0 group-hover/product:opacity-100 transition-all"
-                                                            >
-                                                                <Trash2 className="h-3.5 w-3.5" />
-                                                            </button>
+                                                            {editingProduct?.id === product.id ? (
+                                                                <div className="flex-1 flex items-center gap-2">
+                                                                    <input
+                                                                        type="text"
+                                                                        value={editingProduct.name}
+                                                                        onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
+                                                                        className="flex-1 px-2 py-1 border border-indigo-200 rounded text-sm outline-none focus:ring-1 focus:ring-indigo-500"
+                                                                        autoFocus
+                                                                        onKeyPress={(e) => e.key === 'Enter' && handleUpdateProduct()}
+                                                                    />
+                                                                    <button onClick={handleUpdateProduct} className="p-1 text-indigo-600 hover:bg-indigo-50 rounded"><Edit3 className="h-3.5 w-3.5" /></button>
+                                                                    <button onClick={() => setEditingProduct(null)} className="p-1 text-slate-400 hover:text-slate-600"><X className="h-3.5 w-3.5" /></button>
+                                                                </div>
+                                                            ) : (
+                                                                <>
+                                                                    <span className="text-sm font-medium text-slate-700">{product.name}</span>
+                                                                    <div className="flex items-center gap-1 opacity-0 group-hover/product:opacity-100 transition-all">
+                                                                        <button
+                                                                            onClick={() => setEditingProduct(product)}
+                                                                            className="p-1.5 text-slate-300 hover:text-indigo-500 hover:bg-indigo-50 rounded-md transition-all"
+                                                                        >
+                                                                            <Edit3 className="h-3.5 w-3.5" />
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => onDeleteProduct(product.id)}
+                                                                            className="p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-md transition-all"
+                                                                        >
+                                                                            <Trash2 className="h-3.5 w-3.5" />
+                                                                        </button>
+                                                                    </div>
+                                                                </>
+                                                            )}
                                                         </div>
                                                     ))}
 
