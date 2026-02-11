@@ -63,8 +63,14 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({
             </div>
           ) : (
             verticals.map(family => {
-              const familyProducts = products.filter(p => p.familyId === family.id && items.some(i => i.productId === p.id));
-              if (familyProducts.length === 0) return null;
+              const familyProducts = products.filter(p => p.familyId === family.id);
+              // if (familyProducts.length === 0) return null; // Logic removed to allow families with just items to show?
+              // Actually, user wants to see Family even if no products? "A family NOT have a subproduct"
+              // If family has no products AND no items, maybe hide?
+              // But let's verify later. For now, show if it has anything.
+              const familyOrphanItems = items.filter(i => i.verticalId === family.id && (!i.productId || !products.some(p => p.id === i.productId)));
+
+              if (familyProducts.length === 0 && familyOrphanItems.length === 0) return null;
 
               return (
                 <div key={family.id} className="border-b-4 border-slate-200/40">
@@ -93,6 +99,28 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({
                       </div>
                     </div>
                   ))}
+
+                  {/* Orphan Items for this Family */}
+                  {familyOrphanItems.length > 0 && (
+                    <div className="flex border-b border-slate-100 group/row bg-slate-50/20">
+                      <div className="w-64 flex-shrink-0 p-8 border-r border-slate-200/60 sticky left-0 z-30 bg-white group-hover/row:bg-slate-50/50 transition-all flex items-center">
+                        <div className="flex items-center gap-3 opacity-70">
+                          <div className="h-9 w-9 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400">
+                            <Timer className="h-4 w-4" />
+                          </div>
+                          <h3 className="font-display font-medium text-slate-500 leading-tight text-sm tracking-tight">{t('standaloneThemes') || 'Temas Avulsos'}</h3>
+                        </div>
+                      </div>
+                      <div className="flex-1 relative min-h-[180px]">
+                        <GridBackground />
+                        <div className="relative p-8 grid grid-cols-12 gap-y-6 auto-rows-min">
+                          {familyOrphanItems.map(item => (
+                            <ItemWrapper key={item.id} item={item} milestones={milestones} onEdit={() => onEditItem(item)} onDragStart={() => setDraggedItemId(item.id)} />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })
