@@ -104,6 +104,13 @@ const ItemModal: React.FC<ItemModalProps> = ({
     }));
   };
 
+  const updateSubFeatureTitle = (id: string, newTitle: string) => {
+    setFormData(prev => ({
+      ...prev,
+      subFeatures: prev.subFeatures.map(sf => sf.id === id ? { ...sf, title: newTitle } : sf)
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const tags = formData.tagsString.split(',').map(t => t.trim()).filter(t => t !== '');
@@ -130,12 +137,12 @@ const ItemModal: React.FC<ItemModalProps> = ({
           {/* Main Info */}
           <div className="space-y-8">
             <div>
-              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('title')}</label>
+              <label className="block text-sm font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('title')}</label>
               <input required type="text" className="w-full px-6 py-4 border border-slate-200 rounded-3xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 outline-none transition-all font-bold text-slate-900 text-lg placeholder:text-slate-300 shadow-sm" placeholder={t('titlePlaceholder')} value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
             </div>
 
             <div>
-              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('description')}</label>
+              <label className="block text-sm font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('description')}</label>
               <textarea className="w-full px-6 py-4 border border-slate-200 rounded-3xl outline-none resize-none bg-slate-50/50 text-slate-700 min-h-[100px] focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 transition-all font-medium" rows={3} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
             </div>
 
@@ -144,9 +151,9 @@ const ItemModal: React.FC<ItemModalProps> = ({
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                   <div className="h-2 w-2 rounded-full bg-indigo-500 animate-pulse"></div>
-                  <label className="text-[11px] font-black text-indigo-600 uppercase tracking-widest">{t('subFeatures')}</label>
+                  <label className="text-sm font-black text-indigo-600 uppercase tracking-widest">{t('subFeatures')}</label>
                 </div>
-                <div className="text-[10px] font-bold text-indigo-400 bg-white px-3 py-1 rounded-full border border-indigo-100/50 shadow-sm">
+                <div className="text-xs font-bold text-indigo-400 bg-white px-3 py-1 rounded-full border border-indigo-100/50 shadow-sm">
                   {formData.subFeatures.filter(f => f.isCompleted).length} / {formData.subFeatures.length} {t('completed')}
                 </div>
               </div>
@@ -157,7 +164,12 @@ const ItemModal: React.FC<ItemModalProps> = ({
                     <button type="button" onClick={() => toggleSubFeature(sf.id)} className="transition-all transform hover:scale-110">
                       {sf.isCompleted ? <CheckCircle2 className="h-6 w-6 text-emerald-500" /> : <Circle className="h-6 w-6 text-slate-200" />}
                     </button>
-                    <span className={`flex-1 text-sm font-bold ${sf.isCompleted ? 'text-slate-300 line-through' : 'text-slate-700'}`}>{sf.title}</span>
+                    <input
+                      type="text"
+                      className={`flex-1 text-sm font-bold bg-transparent border-none focus:ring-0 p-0 ${sf.isCompleted ? 'text-slate-300 line-through' : 'text-slate-700 hover:text-indigo-600 focus:text-indigo-600 transition-colors'}`}
+                      value={sf.title}
+                      onChange={(e) => updateSubFeatureTitle(sf.id, e.target.value)}
+                    />
                     <button type="button" onClick={() => removeSubFeature(sf.id)} className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500 transition-all p-1.5 hover:bg-rose-50 rounded-lg">
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -182,7 +194,7 @@ const ItemModal: React.FC<ItemModalProps> = ({
 
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('vertical')}</label>
+                <label className="block text-sm font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('vertical')}</label>
                 <div className="relative">
                   <select className="w-full px-5 py-3.5 border border-slate-200 rounded-2xl outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all" value={formData.verticalId} onChange={e => {
                     const newVid = e.target.value;
@@ -198,7 +210,7 @@ const ItemModal: React.FC<ItemModalProps> = ({
                 </div>
               </div>
               <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('product')}</label>
+                <label className="block text-sm font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('product')}</label>
                 <div className="relative">
                   <select className="w-full px-5 py-3.5 border border-slate-200 rounded-2xl outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all" value={formData.productId} onChange={e => setFormData({ ...formData, productId: e.target.value, milestoneId: '' })}>
                     <option value="">{t('unlinked') || 'Sem Subproduto (Geral)'}</option>
@@ -208,7 +220,7 @@ const ItemModal: React.FC<ItemModalProps> = ({
                 </div>
               </div>
               <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('startDate')}</label>
+                <label className="block text-sm font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('startDate')}</label>
                 <div className="relative">
                   <select className="w-full px-5 py-3.5 border border-slate-200 rounded-2xl outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all" value={formData.startMonth} onChange={e => setFormData({ ...formData, startMonth: parseInt(e.target.value) })}>
                     {MONTH_NAMES.map((m, i) => <option key={m} value={i}>{m}</option>)}
@@ -220,7 +232,7 @@ const ItemModal: React.FC<ItemModalProps> = ({
 
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('duration')}</label>
+                <label className="block text-sm font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('duration')}</label>
                 <div className="relative">
                   <select className="w-full px-5 py-3.5 border border-slate-200 rounded-2xl outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all" value={formData.spanMonths} onChange={e => setFormData({ ...formData, spanMonths: parseInt(e.target.value) })}>
                     {[1, 2, 3, 4, 5, 6].map(v => <option key={v} value={v}>{v} {v === 1 ? t('monthUnit') : t('monthsUnit')}</option>)}
@@ -229,7 +241,7 @@ const ItemModal: React.FC<ItemModalProps> = ({
                 </div>
               </div>
               <div>
-                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('milestones')}</label>
+                <label className="block text-sm font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('milestones')}</label>
                 <div className="relative">
                   <select
                     className="w-full px-5 py-3.5 border border-slate-200 rounded-2xl outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all"
@@ -245,7 +257,7 @@ const ItemModal: React.FC<ItemModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('priority')}</label>
+              <label className="block text-sm font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('priority')}</label>
               <div className="relative">
                 <select className="w-full px-5 py-3.5 border border-slate-200 rounded-2xl outline-none appearance-none bg-slate-50/50 font-bold text-sm text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all" value={formData.priority} onChange={e => setFormData({ ...formData, priority: e.target.value as Priority })}>
                   {Object.values(Priority).map(p => <option key={p} value={p}>{p === Priority.HIGH ? t('high') : p === Priority.MEDIUM ? t('medium') : t('low')}</option>)}
@@ -255,7 +267,7 @@ const ItemModal: React.FC<ItemModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('tags')}</label>
+              <label className="block text-sm font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">{t('tags')}</label>
               <input type="text" className="w-full px-6 py-4 border border-slate-200 rounded-3xl outline-none bg-slate-50/50 text-slate-700 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-600 transition-all font-bold placeholder:text-slate-300" placeholder={t('tagsPlaceholder')} value={formData.tagsString} onChange={e => setFormData({ ...formData, tagsString: e.target.value })} />
             </div>
           </div>
