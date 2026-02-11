@@ -19,6 +19,7 @@ export interface Product {
   name: string;
   description: string;
   color: string;
+  _synced?: boolean;
 }
 
 export interface PersistenceState {
@@ -32,12 +33,14 @@ export interface Milestone {
   id: string;
   title: string;
   description: string;
+  _synced?: boolean;
 }
 
 export interface Vertical {
   id: string;
   name: string;
   color: string;
+  _synced?: boolean;
 }
 
 export interface Dependency {
@@ -71,6 +74,7 @@ export interface RoadmapItem {
   externalId?: string;
   integrationSource?: 'jira' | 'trello';
   quarter: string;
+  _synced?: boolean;
 }
 
 export type ViewType = 'board' | 'timeline' | 'portfolio' | 'analytics';

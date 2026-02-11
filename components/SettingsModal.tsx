@@ -62,7 +62,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         const newFamily: Vertical = {
             id: Math.random().toString(36).substring(2, 9),
             name: newFamilyName,
-            color: newFamilyColor
+            color: newFamilyColor,
+            _synced: false
         };
         onSaveVertical(newFamily);
         setNewFamilyName('');
@@ -73,7 +74,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         if (!newMilestone.title.trim()) return;
         const milestone: Milestone = {
             id: Math.random().toString(36).substring(2, 9),
-            ...newMilestone
+            ...newMilestone,
+            _synced: false
         };
         onSaveMilestone(milestone);
         setNewMilestone({
@@ -89,7 +91,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             familyId,
             name: newProductName,
             description: '',
-            color: 'bg-indigo-500'
+            color: 'bg-indigo-500',
+            _synced: false
         };
         onSaveProduct(newProduct);
         setNewProductName('');
@@ -97,7 +100,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
     const handleUpdateFamily = () => {
         if (editingFamily && editingFamily.name.trim()) {
-            onSaveVertical(editingFamily);
+            onSaveVertical({ ...editingFamily, _synced: false });
             setEditingFamily(null);
         }
     };

@@ -109,10 +109,22 @@ const App: React.FC = () => {
         productId: m.product_id
       }));
 
-      setProducts(cloudProducts);
-      setItems(cloudItems);
-      setMilestones(cloudMilestones);
-      setVerticals(cloudVerticals);
+      setProducts(prev => [
+        ...cloudProducts,
+        ...prev.filter(p => p._synced === false && !cloudProducts.some(cp => cp.id === p.id))
+      ]);
+      setItems(prev => [
+        ...cloudItems,
+        ...prev.filter(i => i._synced === false && !cloudItems.some(ci => ci.id === i.id))
+      ]);
+      setMilestones(prev => [
+        ...cloudMilestones,
+        ...prev.filter(m => m._synced === false && !cloudMilestones.some(cm => cm.id === m.id))
+      ]);
+      setVerticals(prev => [
+        ...cloudVerticals,
+        ...prev.filter(v => v._synced === false && !cloudVerticals.some(cv => cv.id === v.id))
+      ]);
 
       // Sincroniza o local com a nuvem
       await localDB.save('visionpath_data', {
@@ -175,6 +187,7 @@ const App: React.FC = () => {
         setSyncStatus('error');
       } else {
         setSyncStatus('synced');
+        setItems(prev => prev.map(i => i.id === updatedItem.id ? { ...i, _synced: true } : i));
       }
     }
     await persistChanges(nextItems, products, milestones, verticals);
@@ -185,7 +198,8 @@ const App: React.FC = () => {
       ...item,
       id: Math.random().toString(36).substring(2, 9),
       createdAt: Date.now(),
-      quarter: getQuarterFromMonth(item.startMonth)
+      quarter: getQuarterFromMonth(item.startMonth),
+      _synced: false
     };
     await handleUpdateItem(newItem);
   };
@@ -252,6 +266,7 @@ const App: React.FC = () => {
         setSyncStatus('error');
       } else {
         setSyncStatus('synced');
+        setProducts(prev => prev.map(p => p.id === product.id ? { ...p, _synced: true } : p));
       }
     }
     await persistChanges(items, nextProducts, milestones, verticals);
@@ -278,6 +293,7 @@ const App: React.FC = () => {
         setSyncStatus('error');
       } else {
         setSyncStatus('synced');
+        setMilestones(prev => prev.map(m => m.id === milestone.id ? { ...m, _synced: true } : m));
       }
     }
     await persistChanges(items, products, nextMilestones, verticals);
@@ -304,6 +320,7 @@ const App: React.FC = () => {
         setSyncStatus('error');
       } else {
         setSyncStatus('synced');
+        setVerticals(prev => prev.map(v => v.id === vertical.id ? { ...v, _synced: true } : v));
       }
     }
     await persistChanges(items, products, milestones, nextVerticals);
