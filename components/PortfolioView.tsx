@@ -63,7 +63,7 @@ const PortfolioView: React.FC<PortfolioViewProps> = ({
             </div>
           ) : (
             verticals.map(family => {
-              const familyProducts = products.filter(p => p.familyId === family.id);
+              const familyProducts = products.filter(p => p.familyId === family.id && items.some(i => i.productId === p.id));
               if (familyProducts.length === 0) return null;
 
               return (
